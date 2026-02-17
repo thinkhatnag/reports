@@ -8,7 +8,6 @@ import RecordingPage from "./recording.page.js";
 import { faker } from "@faker-js/faker";
 import SpanishLanguage from "./spanishLanguage.js";
 import LoginPage from "./login.page.js";
-import { homeEnvVarCheck } from "appium-xcuitest-driver/build/lib/doctor/required-checks.js";
 class SettingsPage {
   get stettings() {
     return $('//XCUIElementTypeNavigationBar[@name="Settings"]');

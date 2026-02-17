@@ -101,7 +101,7 @@ export const config = {
   specs: [
     // "./test/spec/English/home.spec.js",
     // "./test/spec/English/Forgot_Password.spec.js",
-    "./test/spec/English/Login.spec.js",
+    // "./test/spec/English/Login.spec.js",
     // "./test/spec/English/Setting.spec.js",
     // "./test/spec/English/New_Patient.spec.js",
     // "./test/spec/English/Existing_Patient.spec.js",
@@ -109,7 +109,7 @@ export const config = {
     // "./test/spec/Spanish/Login_Es.spec.js",
     // "./test/spec/Spanish/Settings_ES.spec.js",
     // "./test/spec/Spanish/New_Patient_ES.spec.js",
-    // "./test/spec/Spanish/Existing_Patient_ES.spec.js",
+    "./test/spec/Spanish/Existing_Patient_ES.spec.js",
     // './test/spec/Test.spec.js',
   ],
   // Patterns to exclude.
@@ -266,15 +266,7 @@ export const config = {
   // see also: https://webdriver.io/docs/dot-reporter
   reporters: [
     "spec",
-    [
-      "html-nice",
-      {
-        outputDir: "./reports/html-reports/",
-        filename: "report.html",
-        reportTitle: "NOKI IOS Test Report",
-        useOnAfterCommandForScreenshot: false,
-      },
-    ],
+
     [
       "allure",
       {

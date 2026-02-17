@@ -599,14 +599,22 @@ class RecordingPage {
     await verify(this.PrevEncounterRef);
     await verifyAndClick(this.PrevEncounterRefNo);
   }
+  get draftinfo() {
+    return $(`~Please continue or delete the draft to finalize the encounter.`);
+  }
 
   async finalize_Encounter() {
     await waitForElement(this.SoapNoteBtn);
-    // await verifyAndClick(this.SoapNoteScreenTxtField);
-    // await verifyAndClick(this.returnBtn);
     await verifyAndClick(this.finaliseEncounter);
-    await verifyAndClick(this.finaliseEncounterOk);
-    await driver.pause(20000);
+    if (await this.draftinfo.isDisplayed()) {
+      allureRepoter.addIssue(
+        "the conversation is not finalized due to this encounter is drafted",
+      );
+      await this.C_OK.click();
+    } else {
+      await verifyAndClick(this.finaliseEncounterOk);
+    }
+    await driver.pause(2000);
   }
   async recordAudioAndSaveAsDraft() {
     await AudioManeger.playAudio("english");

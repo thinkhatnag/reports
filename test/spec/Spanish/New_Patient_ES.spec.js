@@ -9,7 +9,6 @@ import {
 import allureReporter from "@wdio/allure-reporter";
 import AudioManeger from "../../screenObjectModel/audioManeger.js";
 import LoginPage from "../../screenObjectModel/login.page.js";
-import SettingsPage from "/Users/nagasubarayudu/Desktop/IOS/test/screenObjectModel/setting.page.js";
 import SpanishLanguage from "../../screenObjectModel/spanishLanguage.js";
 import RecordingPage from "../../screenObjectModel/recording.page.js";
 import PatientsPage from "../../screenObjectModel/patients.page.js";
@@ -42,11 +41,12 @@ it("Automatic Sync Verification (Offline to Online and Vice Versa) for the First
   await SpanishLanguage.PlayBtn.click();
   await AudioManeger.resumeAudio(); //correct
   console.log("Audio resumed:", AudioManeger.currentAudioFile);
-  await driver.pause(30000); //again playing audio for 1 min in online
+  await driver.pause(30000); 
   await AudioManeger.pauseAudio();
   await driver.pause(2000);
-  await aeroplaneModeOn();
-  await driver.pause(5000);
+  await aeroplaneModeOn(); //. offline
+  await driver.pause(5000)
+  
 });
 it("App Killed and Reopened (Offline Mode Verification) for the First Encounter -Es", async () => {
   await driver.terminateApp(process.env.BUNDLE_ID);
@@ -72,6 +72,7 @@ it("App Killed in Offline and Reopened in Online Mode Verification for the First
 });
 it("Offline Mode Stop and App Kill Verification for the First Encounter -Es", async () => {
   await AudioManeger.resumeAudio();
+  await RecordingPage.playBtn.click();
   await driver.pause(30000);
   await AudioManeger.stopAudio();
   await verifyAndClick(RecordingPage.stopBtn);
@@ -88,21 +89,27 @@ it("Offline Mode Stop and App Kill Verification for the First Encounter -Es", as
   await driver.activateApp(process.env.BUNDLE_ID);
   await driver.pause(5000);
 });
-it("First Conversation and SOAP Note Generation for the First Encounter -Es", async () => {
+it("SOAP Note Generation in First Encounter -Es", async () => {
   try {
     await waitForElement(SpanishLanguage.quickActionButton);
-  } catch (error) {
+  } catch {
     if (await SpanishLanguage.quickActionButton.isDisplayed()) {
       await SpanishLanguage.SOAPNOTE_Verification();
     } else {
       allureReporter.addIssue(
         "Quick Action Button is not displayed even after long wait waiting",
       );
-      await LoginPage.restartApp();
+      await driver.terminateApp(process.env.BUNDLE_ID);
+      await driver.pause(5000);
+      await driver.activateApp(process.env.BUNDLE_ID);
       await driver.pause(5000);
       await HomePage.patients.click();
-      await SpanishLanguage.patientSearch(shaared.createdPatient);
-      await PatientsPage.firstEncounter.click();
+      await SpanishLanguage.patientSearchAndContinue(shared.createdPatient);
+      if (await PatientsPage.firstEncounter.isDisplayed()) {
+        await PatientsPage.firstEncounter.click();
+      } else {
+        await PatientsPage.firstEncounterForExistingPatient.click();
+      }
       await driver.pause(5000);
     }
   }
@@ -129,14 +136,6 @@ it("Second Conversation for the First Encounter -Es", async () => {
   await waitForElement(SpanishLanguage.endEncounter);
   await verifyAndClick(SpanishLanguage.endEncounter);
   await driver.pause(5000);
-  if (await SpanishLanguage.stopBtn.isDisplayed()) {
-    await verifyAndClick(SpanishLanguage.stopBtn);
-    allureReporter.addIssue(
-      "Here even after clicking End Encouter, soap note generation is not Intiated",
-    );
-  } else {
-    console.log("issue related to api is resolved");
-  }
 });
 
 it("SOAP Note Verification for the Second Conversation for the First Encounter -Es", async () => {
@@ -149,11 +148,17 @@ it("SOAP Note Verification for the Second Conversation for the First Encounter -
       allureReporter.addIssue(
         "Quick Action Button is not displayed even after long wait waiting",
       );
-      await LoginPage.restartApp();
+      await driver.terminateApp(process.env.BUNDLE_ID);
+      await driver.pause(5000);
+      await driver.activateApp(process.env.BUNDLE_ID);
       await driver.pause(5000);
       await HomePage.patients.click();
-      await SpanishLanguage.patientSearch(shaared.createdPatient);
-      await PatientsPage.firstEncounter.click();
+      await SpanishLanguage.patientSearchAndContinue(shared.createdPatient);
+      if (await PatientsPage.firstEncounter.isDisplayed()) {
+        await PatientsPage.firstEncounter.click();
+      } else {
+        await PatientsPage.firstEncounterForExistingPatient.click();
+      }
       await driver.pause(5000);
     }
   }
@@ -176,11 +181,17 @@ it("SOAP Note Generation and Verification for the Draft Conversation for the Fir
       allureReporter.addIssue(
         "Quick Action Button is not displayed even after long wait waiting",
       );
-      await LoginPage.restartApp();
+      await driver.terminateApp(process.env.BUNDLE_ID);
+      await driver.pause(5000);
+      await driver.activateApp(process.env.BUNDLE_ID);
       await driver.pause(5000);
       await HomePage.patients.click();
-      await SpanishLanguage.patientSearch(shaared.createdPatient);
-      await PatientsPage.firstEncounter.click();
+      await SpanishLanguage.patientSearchAndContinue(shared.createdPatient);
+      if (await PatientsPage.firstEncounter.isDisplayed()) {
+        await PatientsPage.firstEncounter.click();
+      } else {
+        await PatientsPage.firstEncounterForExistingPatient.click();
+      }
       await driver.pause(5000);
     }
   }

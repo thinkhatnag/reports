@@ -78,6 +78,7 @@ it("App Killed in Offline and Reopened in Online Mode Verification for the First
 });
 it("Offline Mode Stop and App Kill Verification for the First Encounter", async () => {
   await AudioManeger.resumeAudio();
+  await RecordingPage.playBtn.click();
   await driver.pause(30000);
   await AudioManeger.stopAudio();
   await verifyAndClick(RecordingPage.stopBtn);
@@ -94,7 +95,7 @@ it("Offline Mode Stop and App Kill Verification for the First Encounter", async 
   await driver.activateApp(process.env.BUNDLE_ID);
   await driver.pause(5000);
 });
-it("First Conversation and SOAP Note Generation in First Encounter", async () => {
+it("SOAP Note Generation in First Encounter", async () => {
   try {
     await waitForElement(QuickActions.quickActionButton);
   } catch (error) {
@@ -110,7 +111,11 @@ it("First Conversation and SOAP Note Generation in First Encounter", async () =>
       await driver.pause(5000);
       await HomePage.patients.click();
       await PatientsPage.patientSearchAndContinue(shared.createdPatient);
-      await PatientsPage.firstEncounter.click();
+      if (await PatientsPage.firstEncounter.isDisplayed()) {
+        await PatientsPage.firstEncounter.click();
+      } else {
+        await PatientsPage.firstEncounterForExistingPatient.click();
+      }
       await driver.pause(5000);
     }
   }
@@ -155,7 +160,11 @@ it("SOAP Note Verification for the Second Conversation in First Encounter", asyn
       await driver.pause(5000);
       await HomePage.patients.click();
       await PatientsPage.patientSearchAndContinue(shared.createdPatient);
-      await PatientsPage.firstEncounter.click();
+      if (await PatientsPage.firstEncounter.isDisplayed()) {
+        await PatientsPage.firstEncounter.click();
+      } else {
+        await PatientsPage.firstEncounterForExistingPatient.click();
+      }
       await driver.pause(5000);
     }
   }
@@ -185,7 +194,11 @@ it("SOAP Note Generation and Verification for the Draft Conversation in the Firs
       await driver.pause(5000);
       await HomePage.patients.click();
       await PatientsPage.patientSearchAndContinue(shared.createdPatient);
-      await PatientsPage.firstEncounter.click();
+      if (await PatientsPage.firstEncounter.isDisplayed()) {
+        await PatientsPage.firstEncounter.click();
+      } else {
+        await PatientsPage.firstEncounterForExistingPatient.click();
+      }
       await driver.pause(5000);
     }
   }

@@ -1,0 +1,56 @@
+￼  ¿Cómo puedo ayudarle hoy?
+￼  Hola, doctora. He tenido fuertes dolores de cabeza y algunos problemas.
+￼  ¿Dónde siente el dolor?
+￼  En la parte superior de mi cabeza y, a veces, siento un dolor agudo y punzante. Pueden durar horas y, a veces, empeorar tanto que tengo que acostarme en una habitación oscura.
+￼  Veo. ¿Ha notado algún otro síntoma además de los dolores de cabeza?
+￼  Sí, he tenido algo de visión borrosa, especialmente cuando los dolores de cabeza son muy intensos. A veces también me siento mareado y siento un hormigueo extraño en mi mano izquierda. Últimamente he tenido dificultades para encontrar palabras y hablar con claridad.
+￼  Entiendo. ¿Ha tenido episodios anteriores como este o es la primera vez que experimenta estos síntomas?
+￼  Me diagnosticaron hace unos años.
+￼  Hablemos un poco más sobre su estilo de vida e historia familiar, que pueden darnos pistas importantes.
+￼  Eso suena bien. Gracias.
+￼  ¿Fuma o bebe alcohol?
+￼  No, no fumo. Solía tomar una copa de vino de vez en cuando, pero dejé de beber por completo hace aproximadamente un año.
+￼  Es bueno saberlo. ¿A qué se dedica en el trabajo?
+￼  Soy ingeniero de software, así que paso mucho tiempo sentado y trabajando en una computadora. A veces estoy tan absorto en mi trabajo que me olvido de tomar descansos.
+￼  ¿Y qué hay de los antecedentes familiares?
+￼  Mi padre sufrió un derrame cerebral cuando tenía poco más de 60 años. También tenía presión arterial alta. Aparte de eso, no hay antecedentes familiares importantes de problemas neurológicos que yo sepa.
+￼  Gracias por compartir eso. ¿Ha notado algún otro síntoma como náuseas, cambios en el apetito o pérdida de peso?
+￼  A veces he sentido un poco de náuseas, especialmente cuando los dolores de cabeza son intensos, pero no es siempre. Mi apetito en general es bueno y no he perdido peso.
+￼  Comprobaremos sus signos vitales junto con su examen físico.
+￼  Suena bien. Estoy listo.
+￼  Su presión arterial es un poco alta, 145/90 mmHg. Su saturación de oxígeno es del 98 %, lo cual es bueno. Su frecuencia respiratoria es normal, 16 respiraciones por minuto. Tiene una fiebre leve de 37.1 °C y su pulso es de 78 latidos por minuto.
+￼  No me sorprende que mi presión arterial sea alta. Siempre está un poco más alta.
+￼  ¿Le duele cuando presiono aquí?
+￼  No, eso no duele.
+￼  Su corazón suena normal, sin soplos ni latidos irregulares. ¿Alguna vez ha experimentado dolor en el pecho o palpitaciones?
+￼  No, mi corazón se siente bien. Son solo los dolores de cabeza y los otros síntomas.
+￼  Los sonidos respiratorios son claros, sin sibilancias ni crepitantes. ¿Ha tenido algún problema para respirar?
+￼  No, mi respiración ha estado bien.
+¿Cómo puedo ayudarle hoy?
+Hola, doctora. He tenido fuertes dolores de cabeza y algunos problemas.
+¿Dónde siente el dolor?
+En la parte superior de mi cabeza y, a veces, siento un dolor agudo y punzante. Pueden durar horas y, a veces, empeorar tanto que tengo que acostarme en una habitación oscura.
+Veo. ¿Ha notado algún otro síntoma además de los dolores de cabeza?
+Sí, he tenido algo de visión borrosa, especialmente cuando los dolores de cabeza son muy intensos. A veces también me siento mareado y siento un hormigueo extraño en mi mano izquierda. Últimamente he tenido dificultades para encontrar palabras y hablar con claridad.
+Entiendo. ¿Ha tenido episodios anteriores como este o es la primera vez que experimenta estos síntomas?
+Me diagnosticaron hace unos años.
+Hablemos un poco más sobre su estilo de vida e historia familiar, que pueden darnos pistas importantes.
+Eso suena bien. Gracias.
+¿Fuma o bebe alcohol?
+No, no fumo. Solía tomar una copa de vino de vez en cuando, pero dejé de beber por completo hace aproximadamente un año.
+Es bueno saberlo. ¿A qué se dedica en el trabajo?
+Soy ingeniero de software, así que paso mucho tiempo sentado y trabajando en una computadora. A veces estoy tan absorto en mi trabajo que me olvido de tomar descansos.
+¿Y qué hay de los antecedentes familiares?
+Mi padre sufrió un derrame cerebral cuando tenía poco más de 60 años. También tenía presión arterial alta. Aparte de eso, no hay antecedentes familiares importantes de problemas neurológicos que yo sepa.
+Gracias por compartir eso. ¿Ha notado algún otro síntoma como náuseas, cambios en el apetito o pérdida de peso?
+A veces he sentido un poco de náuseas, especialmente cuando los dolores de cabeza son intensos, pero no es siempre. Mi apetito en general es bueno y no he perdido peso.
+Comprobaremos sus signos vitales junto con su examen físico.
+Suena bien. Estoy listo.
+Su presión arterial es un poco alta, 145/90 mmHg. Su saturación de oxígeno es del 98 %, lo cual es bueno. Su frecuencia respiratoria es normal, 16 respiraciones por minuto. Tiene una fiebre leve de 37.1 °C y su pulso es de 78 latidos por minuto.
+No me sorprende que mi presión arterial sea alta. Siempre está un poco más alta.
+¿Le duele cuando presiono aquí?
+No, eso no duele.
+Su corazón suena normal, sin soplos ni latidos irregulares. ¿Alguna vez ha experimentado dolor en el pecho o palpitaciones?
+No, mi corazón se siente bien. Son solo los dolores de cabeza y los otros síntomas.
+Los sonidos respiratorios son claros, sin sibilancias ni crepitantes. ¿Ha tenido algún problema para respirar?
+No, mi respiración ha estado bien.

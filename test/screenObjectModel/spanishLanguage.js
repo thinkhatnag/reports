@@ -1339,7 +1339,7 @@ class SpanishLanguage {
     await verifyAndClick(this.printPageCancel);
     await verifyAndClick(this.printPageBackBtn);
   }
-   async selectRandomGender() {
+  async selectRandomGender() {
     const options = [this.male, this.female, this.other, this.unknown];
 
     await this.genderPicker.click();
@@ -1527,10 +1527,22 @@ class SpanishLanguage {
     await waitForElement(this.PrevEncounterRef);
     await verifyAndClick(this.PrevEncounterRefYes);
   }
+  get draftinfo() {
+    return $(
+      "~Por favor, continúe o elimine el borrador para finalizar el encuentro.",
+    );
+  }
   async finalize_Encounter() {
     await waitForElement(this.SoapNoteBtn);
     await this.finaliseEncounter.click();
-    await this.ok.click();
+    if (await this.draftinfo.isDisplayed()) {
+      allureReporter.addIssue(
+        "the conversation is not finalized due to this encounter is draft conversation",
+      );
+      await this.COK.click();
+    } else {
+      await this.ok.click();
+    }
     await validate(this.finaliseEncounteSuccessrTxt);
     await driver.pause(5000);
     await LoginPage.restartApp();

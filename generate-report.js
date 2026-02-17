@@ -70,6 +70,105 @@ resultFiles.forEach((file) => {
 });
 
 console.log(`✅ Parsed ${testCases.length} test cases`);
+// ========================================
+// 🔁 Merge Allure retries (KEEP ONLY LATEST ATTEMPT)
+// ========================================
+// ========================================
+// 🔁 Collapse retries + add retry symbol
+// ========================================
+
+const logicalTests = new Map();
+
+for (const test of testCases) {
+  const key = test.baseTestName; // logical identity
+
+  if (!logicalTests.has(key)) {
+    logicalTests.set(key, {
+      ...test,
+      attempts: 1,
+    });
+  } else {
+    const existing = logicalTests.get(key);
+
+    existing.attempts += 1;
+
+    // latest attempt wins
+    if (test.duration >= existing.duration) {
+      logicalTests.set(key, {
+        ...test,
+        attempts: existing.attempts,
+      });
+    }
+  }
+}
+
+// rebuild array with retry marker
+testCases.length = 0;
+
+for (const test of logicalTests.values()) {
+  if (test.attempts > 1) {
+    test.name += ' <span class="retry-badge">RETRY</span>';
+    test.baseTestName += ' <span class="retry-badge">RETRY</span>';
+  }
+  testCases.push(test);
+}
+
+console.log(`🔁 Logical tests after retry merge: ${testCases.length}`);
+
+const mergedByHistory = new Map();
+
+resultFiles.forEach((file) => {
+  try {
+    const raw = JSON.parse(fs.readFileSync(file, "utf8"));
+
+    // Fallback key if historyId is missing
+    const historyKey = raw.historyId || raw.fullName || raw.name || file;
+
+    const startTime = raw.start || 0;
+
+    if (!mergedByHistory.has(historyKey)) {
+      mergedByHistory.set(historyKey, { raw, startTime });
+    } else {
+      const existing = mergedByHistory.get(historyKey);
+
+      // Keep the most recent retry attempt
+      if (startTime > existing.startTime) {
+        mergedByHistory.set(historyKey, { raw, startTime });
+      }
+    }
+  } catch {}
+});
+
+// Rebuild testCases using merged results
+testCases.length = 0;
+
+mergedByHistory.forEach(({ raw }) => {
+  const testName = raw.name || "Unknown Test";
+  const status = raw.status || "unknown";
+  const duration = (raw.stop || 0) - (raw.start || 0);
+  const error = raw.statusDetails?.message || null;
+
+  const isSpanish =
+    testName.includes("-Es") ||
+    testName.includes("_Es") ||
+    testName.includes(" Es ");
+
+  const baseTestName = testName.replace(/-Es|_Es| Es /gi, "").trim();
+
+  testCases.push({
+    name: testName,
+    baseTestName,
+    passed: status === "passed",
+    skipped: status === "skipped" || status === "pending",
+    failed: status === "failed" || status === "broken",
+    duration,
+    error,
+    isSpanish,
+    status,
+  });
+});
+
+console.log(`🔁 After retry merge: ${testCases.length} final test cases`);
 
 // Group tests by base name
 const groupedTests = {};
@@ -182,6 +281,17 @@ const html = `<!DOCTYPE html>
             color: #1f2937;
             font-size: 20px;
         }
+            .retry-badge {
+    margin-left: 8px;
+    padding: 2px 6px;
+    background: #6366f1;
+    color: white;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weigh
+    letter-spacing: 0.5px;
+}
+
         .save-indicator {
             display: inline-block;
             margin-left: 10px;
@@ -450,13 +560,28 @@ const html = `<!DOCTYPE html>
         function exportToCSV() {
             let csv = 'Test Case,English,Spanish,Comments\\n';
             REPORT_DATA.groupedTests.forEach(group => {
-                const englishText = group.english
-                    ? group.english.skipped ? "SKIPPED" : group.english.passed ? "PASS" : "FAIL"
-                    : "NOT RUN";
-                
-                const spanishText = group.spanish
-                    ? group.spanish.skipped ? "SKIPPED" : group.spanish.passed ? "PASS" : "FAIL"
-                    : "NOT RUN";
+               const englishBase = group.english
+    ? group.english.skipped ? "⊗ SKIPPED"
+    : group.english.passed ? "✓ PASS"
+    : "✗ FAIL"
+    : "- NOT RUN";
+
+const spanishBase = group.spanish
+    ? group.spanish.skipped ? "⊗ SKIPPED"
+    : group.spanish.passed ? "✓ PASS"
+    : "✗ FAIL"
+    : "- NOT RUN";
+
+const englishText =
+    group.english?.wasRetried
+        ? englishBase + " 🔁"
+        : englishBase;
+
+const spanishText =
+    group.spanish?.wasRetried
+        ? spanishBase + " 🔁"
+        : spanishBase;
+
                 
                 const input = document.querySelector(\`input[data-test-index="\${group.index}"]\`);
                 const comment = input ? input.value.replace(/,/g, ';').replace(/"/g, '""') : '';

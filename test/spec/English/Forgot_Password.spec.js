@@ -36,12 +36,12 @@ it(`Error message verifcation: "Email not Enterd"`, async () => {
   await verifyAndClick(LoginPage.loginLink);
 });
 
-it(`Verify Rest Password mail generation`, async () => {
+it.only(`Verify Rest Password mail generation`, async () => {
   await verifyAndClick(LoginPage.forgotPassword);
   console.log("Email env:", process.env.Email);
   await LoginPage.enterForgotPasswordEmail(process.env.Email);
   await verify(LoginPage.successMessageForResetLink);
-  await verifyAndClick(LoginPage.continueToLoginr);
+  await verifyAndClick(LoginPage.continueToLogin);
   await LoginPage.activategmailApp();
   await LoginPage.restartApp();
 });

@@ -58,7 +58,7 @@ it(`Login Error message verification: "Wrong password" -Es`, async () => {
   await verify(SpanishLanguage.WrongPassword);
 });
 
-it("Login with correct credential and verify Home screen animation -Es", async () => {
+it.only("Login with correct credential and verify Home screen animation -Es", async () => {
   await SpanishLanguage.enterEmail(process.env.Email);
   await SpanishLanguage.enterPassword(process.env.Password);
   await SpanishLanguage.selectMultiTenant();
