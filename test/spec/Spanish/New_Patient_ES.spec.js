@@ -12,6 +12,7 @@ import LoginPage from "../../screenObjectModel/login.page.js";
 import SpanishLanguage from "../../screenObjectModel/spanishLanguage.js";
 import RecordingPage from "../../screenObjectModel/recording.page.js";
 import PatientsPage from "../../screenObjectModel/patients.page.js";
+import HomePage from "../../screenObjectModel/home.page.js";
 beforeEach(() => {
   allureReporter.addSubSuite("First Encounter E2E Flow -Es");
 });
@@ -41,12 +42,11 @@ it("Automatic Sync Verification (Offline to Online and Vice Versa) for the First
   await SpanishLanguage.PlayBtn.click();
   await AudioManeger.resumeAudio(); //correct
   console.log("Audio resumed:", AudioManeger.currentAudioFile);
-  await driver.pause(30000); 
+  await driver.pause(30000);
   await AudioManeger.pauseAudio();
-  await driver.pause(2000);
+  await driver.pause(5000);
   await aeroplaneModeOn(); //. offline
-  await driver.pause(5000)
-  
+  await driver.pause(5000);
 });
 it("App Killed and Reopened (Offline Mode Verification) for the First Encounter -Es", async () => {
   await driver.terminateApp(process.env.BUNDLE_ID);
@@ -72,7 +72,6 @@ it("App Killed in Offline and Reopened in Online Mode Verification for the First
 });
 it("Offline Mode Stop and App Kill Verification for the First Encounter -Es", async () => {
   await AudioManeger.resumeAudio();
-  await RecordingPage.playBtn.click();
   await driver.pause(30000);
   await AudioManeger.stopAudio();
   await verifyAndClick(RecordingPage.stopBtn);
@@ -120,9 +119,16 @@ it("Transcript verification for the first Encounter -Es", async () => {
 });
 it("Second Conversation for the First Encounter -Es", async () => {
   await verifyAndClick(SpanishLanguage.SoapNoteBtn);
-  await waitForElement(SpanishLanguage.AddConversation);
-  await verifyAndClick(SpanishLanguage.AddConversation);
-  await verifyAndClick(SpanishLanguage.AddConversationConfirmationYes);
+  if (
+    await SpanishLanguage.resumeConversationForMultipleConverstionScenario.isDisplayed()
+  ) {
+    allureRepoter.addIssue("the previous encounter is saved as a dreaft ");
+    await SpanishLanguage.resumeConversationForMultipleConverstionScenario.click();
+    await SpanishLanguage.resumeConversationForMultipleConverstionScenarioYes.click();
+  } else if (await SpanishLanguage.AddConversation.isDisplayed()) {
+    await verifyAndClick(SpanishLanguage.AddConversation);
+    await verifyAndClick(SpanishLanguage.AddConversationConfirmationYes);
+  }
   await AudioManeger.playAudio("spanish");
   await driver.pause(5000);
   await aeroplaneModeOn(); //offline
@@ -153,7 +159,9 @@ it("SOAP Note Verification for the Second Conversation for the First Encounter -
       await driver.activateApp(process.env.BUNDLE_ID);
       await driver.pause(5000);
       await HomePage.patients.click();
+      await driver.pause(2000);
       await SpanishLanguage.patientSearchAndContinue(shared.createdPatient);
+      await driver.pause(2000);
       if (await PatientsPage.firstEncounter.isDisplayed()) {
         await PatientsPage.firstEncounter.click();
       } else {

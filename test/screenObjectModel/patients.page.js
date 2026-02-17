@@ -50,9 +50,8 @@ class PatientsPage {
     await this.patientSearch.setValue(patientName);
   }
   async patientSearchAndContinue(patientName) {
-    await this.Search(patientName);
+    const patientElement =await this.Search(patientName);
     await driver.pause(2000);
-    const patientElement = await searchPatientPage.patientName(patientName);
     await verifyAndClick(patientElement);
   }
 }

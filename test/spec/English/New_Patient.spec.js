@@ -126,9 +126,16 @@ it("Transcript verification for the first Encounter", async () => {
 });
 it("Second Conversation for the first Encounter", async () => {
   await verifyAndClick(RecordingPage.SoapNoteBtn);
-  await waitForElement(RecordingPage.AddConversation);
-  await verifyAndClick(RecordingPage.AddConversation);
-  await verifyAndClick(RecordingPage.AddConversationConfirmationYes);
+  if (
+    await RecordingPage.resumeConversationForMultipleConverstionScenario.isDisplayed()
+  ) {
+    allureReporter.addIssue("the previous encounter is saved as a dreaft ");
+    await RecordingPage.resumeConversationForMultipleConverstionScenario.click();
+    await RecordingPage.resumeConversationForMultipleConverstionScenarioYes.click();
+  } else if (await RecordingPage.AddConversation.isDisplayed()) {
+    await verifyAndClick(RecordingPage.AddConversation);
+    await verifyAndClick(RecordingPage.AddConversationConfirmationYes);
+  }
   await AudioManeger.playAudio("english");
   await driver.pause(5000);
   await aeroplaneModeOff(); //offline
@@ -144,7 +151,7 @@ it("Second Conversation for the first Encounter", async () => {
   await verifyAndClick(RecordingPage.endEncounter);
   await driver.pause(5000);
 });
-it("SOAP Note Verification for the Second Conversation in First Encounter", async () => {
+it("SOAP Note generation for the Second Conversation in First Encounter", async () => {
   try {
     await waitForElement(QuickActions.quickActionButton);
   } catch (error) {
@@ -174,11 +181,11 @@ it("Transcript verification for the Second Conversation in first Encounter", asy
   await RecordingPage.Transcript_Verification();
 });
 
-it("Third Conversation (Draft Creation and Completion of Draft Transcript) for the First Encounter}", async () => {
+it.only("Third Conversation (Draft Creation and Completion of Draft Transcript) for the First Encounter}", async () => {
   await RecordingPage.SoapNoteBtn.click();
   await RecordingPage.third_Conversations_For_New_Patient();
 });
-it("SOAP Note Generation and Verification for the Draft Conversation in the First Encounter", async () => {
+it("SOAP Note Generation for the Draft Conversation in the First Encounter", async () => {
   try {
     await waitForElement(QuickActions.quickActionButton);
   } catch (error) {

@@ -152,7 +152,7 @@ it("Second Conversation for the New Encounter", async () => {
   await waitForElement(RecordingPage.PrevEncounterRef);
   await RecordingPage.PrevEncounterRefYes.click();
 });
-it("SOAP Note Verification for the Second Conversation", async () => {
+it("SOAP Note generation for the Second Conversation", async () => {
   try {
     await waitForElement(QuickActions.quickActionButton);
   } catch (error) {
@@ -185,7 +185,7 @@ it("Third Conversation (Draft Creation and Completion of Draft Transcript)", asy
   await verifyAndClick(RecordingPage.SoapNoteBtn);
   await RecordingPage.third_Conversation_For_Existing_Patient();
 });
-it("SOAP Note Generation and Verification for the Draft Conversation", async () => {
+it("SOAP Note Generation for the Draft Conversation", async () => {
   try {
     await waitForElement(QuickActions.quickActionButton);
   } catch (error) {
@@ -216,7 +216,7 @@ it("Transcript Verification for the Draft Conversation", async () => {
   await RecordingPage.Transcript_Verification();
 });
 
-it("Generation and Regeneration of Quick Action Templates (ICD & CPT, Care Plan, Feedback, Referral)", async () => {
+it("Quick Action Templates generation and regeneration", async () => {
   await QuickActions.ICD_CPT();
   await QuickActions.care_Plan();
   await QuickActions.feed_back();
@@ -236,7 +236,7 @@ it("HayNoki verification", async () => {
 it("Finalize encounter", async () => {
   await RecordingPage.finalize_Encounter();
 });
-it("Logout ", async () => {
+it("Logout", async () => {
   await LoginPage.restartApp();
   await waitForElement(HomePage.startNewEncounterButton);
   await verifyAndClick(HomePage.settings);

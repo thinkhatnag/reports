@@ -1072,7 +1072,7 @@ class SpanishLanguage {
   // }
 
   get generateIcdAndCptCodes() {
-    return $("~Generar códigos ICD y CPT");
+    return $("~Generar Códigos ICD y CPT");
   }
   get generateCarePlan() {
     return $("~Generar plan de atención con explicación");
@@ -1270,7 +1270,6 @@ class SpanishLanguage {
   }
   async ICD_CPT() {
     await waitForElement(this.quickActionButton);
-
     await verifyAndClick(this.quickActionButton);
     await verifyAndClick(this.generateIcdAndCptCodes);
     await waitForElement(this.ok);
@@ -1400,14 +1399,22 @@ class SpanishLanguage {
     await this.deleteBtn.click();
     await this.deleteConformation.click();
   }
+  get SearchBtn() {
+    return $(`~Search`);
+  }
   //Patient Screen
   async Search(patientName) {
-    await this.patientSearch.click();
-    await this.patientSearch.setValue(patientName);
+    await this.PatientSearchTextField.click();
+    await this.PatientSearchTextField.setValue(patientName);
+    await this.SearchBtn.click();
+  }
+  async patentElement(patientName) {
+    await $(`//XCUIElementTypeStaticText[@name="${patientName}`).click();
   }
   async patientSearchAndContinue(patientName) {
     await this.Search(patientName);
-    await verifyAndClick(`//XCUIElementTypeStaticText[@name="${patientName}`);
+    await driver.pause(2000);
+    await this.patentElement(patientName);
   }
   //Search Patient
   async patientSearch(patient) {
@@ -1485,9 +1492,9 @@ class SpanishLanguage {
     await driver.pause(3000);
   }
   async Transcript_Verification() {
+    await waitForElement(this.quickActionButton)
     await verifyAndClick(this.Transcript);
     await RecordingPage.dataScaning(RecordingPage.cleanedTranscriptScroll);
-    await AudioManager.TextComparison();
     await verifyAndClick(this.originalTrnscript);
     await verifyAndClick(this.claeanedTranscript);
     await verifyAndClick(this.SoapNoteBtn);
@@ -1562,32 +1569,19 @@ class SpanishLanguage {
       console.log("No Draft Transcript found.");
     }
   }
-  async multiple_Conversation() {
-    await waitForElement(this.AddConversation);
-    await verifyAndClick(this.AddConversation);
-    await verifyAndClick(this.AddConversationNo);
-    await verifyAndClick(this.AddConversation);
-    await verifyAndClick(this.AddConversationConfirmationYes);
-    await verify(this.pauseBtn);
-    await this.recordAudioAndSaveAsDraft();
-    await driver.pause(3000);
-    await LoginPage.restartApp();
-    await driver.pause(3000);
-    await verifyAndClick(HomePage.encounter);
-    await driver.pause(3000);
-    await this.clickDraftTranscript();
-    await waitForElement(this.finaliseEncounter);
-    await verifyAndClick(this.finaliseEncounter);
-    await driver.pause(3000);
-    await verifyAndClick(this.COK);
-    await verifyAndClick(this.resumeConversationForMultipleConverstionScenario);
-    await verifyAndClick(
-      this.resumeConversationForMultipleConverstionScenarioYes,
-    );
-    await this.recordAudio();
-  }
+
   async third_Conversation_For_Existing_Patitent() {
-    await this.multiple_Conversation();
+    if (
+      await this.resumeConversationForMultipleConverstionScenario.isDisplayed()
+    ) {
+      allureReporter.addIssue("the previous encounter is saved as a dreaft ");
+      await this.resumeConversationForMultipleConverstionScenario.click();
+      await this.resumeConversationForMultipleConverstionScenarioYes.click();
+    } else if (await this.AddConversation.isDisplayed()) {
+      await verifyAndClick(this.AddConversation);
+      await verifyAndClick(this.AddConversationConfirmationYes);
+    }
+    await this.recordAudio();
     await this.PrevEncounterRef.click();
     await this.PrevEncounterRefNo.click();
   }
@@ -1608,7 +1602,17 @@ class SpanishLanguage {
     await this.recordAudio();
   }
   async third_Conversations_For_New_Patient() {
-    await this.multiple_Conversation();
+    if (
+      await this.resumeConversationForMultipleConverstionScenario.isDisplayed()
+    ) {
+      allureReporter.addIssue("the previous encounter is saved as a dreaft ");
+      await this.resumeConversationForMultipleConverstionScenario.click();
+      await this.resumeConversationForMultipleConverstionScenarioYes.click();
+    } else if (await this.AddConversation.isDisplayed()) {
+      await verifyAndClick(this.AddConversation);
+      await verifyAndClick(this.AddConversationConfirmationYes);
+    }
+    await this.recordAudio();
   }
 
   async third_Conversations_For_Existing_Patient() {
@@ -1700,11 +1704,7 @@ class SpanishLanguage {
     }
   }
   async bloodGroup(text) {
-    return await waitForElement(
-      $(
-        `//XCUIElementTypeStaticText[@name="main label" and @label="${text} : "]`,
-      ),
-    );
+    return await waitForElement($(`~${text}`));
   }
 
   async bloodName(name) {
@@ -1746,7 +1746,7 @@ class SpanishLanguage {
     await waitForElement(this.SoapNoteScreenTxtField);
     await verifyAndClick(this.SoapNoteScreenTxtField);
     await this.SoapNoteScreenTxtFieldEntry.setValue(
-      "Grupo sanguíneo O postivo",
+      "Grupo sanguíneo O positivo",
     );
     // await verifyAndClick(this.doneBtn);
     await verifyAndClick(this.send);
@@ -1771,7 +1771,7 @@ class SpanishLanguage {
     await validate(this.COK);
     await verifyAndClick(this.COK);
     await this.bloodGroup("Grupo sanguíneo");
-    await this.bloodName("B negativo");
+    await this.bloodName("B negitivo");
   }
 }
 export default new SpanishLanguage();

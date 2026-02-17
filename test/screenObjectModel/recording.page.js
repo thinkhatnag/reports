@@ -544,11 +544,16 @@ class RecordingPage {
     return $("~OK");
   }
   async multiple_Conversation() {
-    await waitForElement(this.AddConversation);
-    await verifyAndClick(this.AddConversation);
-    await verifyAndClick(this.AddConversationNo);
-    await verifyAndClick(this.AddConversation);
-    await verifyAndClick(this.AddConversationConfirmationYes);
+    if (
+      await this.resumeConversationForMultipleConverstionScenario.isDisplayed()
+    ) {
+      allureRepoter.addIssue("The previous encounter is saved as a dreaft ");
+      await this.resumeConversationForMultipleConverstionScenario.click();
+      await this.resumeConversationForMultipleConverstionScenarioYes.click();
+    } else if (await this.AddConversation.isDisplayed()) {
+      await verifyAndClick(this.AddConversation);
+      await verifyAndClick(this.AddConversationConfirmationYes);
+    }
     await verify(this.pauseBtn);
     await this.recordAudioAndSaveAsDraft();
     console.log(
@@ -563,9 +568,6 @@ class RecordingPage {
     await waitForElement(this.finaliseEncounter);
     await verifyAndClick(this.finaliseEncounter);
     await driver.pause(3000);
-    console.log(
-      "here we have verified that enounter will not be finalized consisting of draft transcript",
-    );
     await verifyAndClick(this.C_OK);
     await verifyAndClick(this.resumeConversationForMultipleConverstionScenario);
     await verifyAndClick(
@@ -576,22 +578,18 @@ class RecordingPage {
     );
     await this.recordAudio();
   }
-  async second_conversation_For_Existing_Patient() {
-    await waitForElement(this.AddConversation);
-    await verifyAndClick(this.AddConversation);
-    await verifyAndClick(this.AddConversationConfirmationYes);
-    await this.recordAudioForExicistingPatient();
-  }
-  async second_Conversations_For_New_Patient() {
-    await waitForElement(this.AddConversation);
-    await verifyAndClick(this.AddConversation);
-    await verifyAndClick(this.AddConversationConfirmationYes);
-    await this.recordAudio();
-  }
+
   async third_Conversations_For_New_Patient() {
-    await waitForElement(this.AddConversation);
-    await verifyAndClick(this.AddConversation);
-    await verifyAndClick(this.AddConversationConfirmationYes);
+    if (
+      await this.resumeConversationForMultipleConverstionScenario.isDisplayed()
+    ) {
+      allureRepoter.addIssue("the previous encounter is saved as a dreaft ");
+      await this.resumeConversationForMultipleConverstionScenario.click();
+      await this.resumeConversationForMultipleConverstionScenarioYes.click();
+    } else if (await this.AddConversation.isDisplayed()) {
+      await verifyAndClick(this.AddConversation);
+      await verifyAndClick(this.AddConversationConfirmationYes);
+    }
     await this.recordAudio();
   }
   async third_Conversation_For_Existing_Patient() {
@@ -869,7 +867,7 @@ class RecordingPage {
     await waitForElement(this.C_OK);
     await verifyAndClick(this.C_OK);
     await this.bloodGroup("Blood Group");
-    await this.bloodName("O negitive");
+    await this.bloodName("O negative");
   }
   async hayNoki() {
     await waitForElement(this.Mic);

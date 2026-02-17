@@ -8,4 +8,3 @@ git add .
 git commit -m "Report Update"
 git push origin main
 
-rm -rf allure-results
