@@ -6,229 +6,240 @@ import path from "path";
 import levenshtein from "fast-levenshtein";
 import allureReporter from "@wdio/allure-reporter";
 
-import RecordingPage from "../screenObjectModel/recording.page.js";
-import SpanishLanguage from "../screenObjectModel/spanishLanguage.js";
-// import path from "path";
 const execPromise = util.promisify(exec);
+
 class AudioManager {
   constructor() {
     this.audioFiles = {
-      english:
-        "/Users/nagasubarayudu/Desktop/IOS/utils/audioFiles/CardiacArrestEN.wav",
-      spanish:
-        "/Users/nagasubarayudu/Desktop/IOS/utils/audioFiles/CardiacArrestES.mp3",
+      english: "/Users/nagasubarayudu/Desktop/IOS/utils/audioFiles/CardiacArrestEN.wav",
+      spanish: "/Users/nagasubarayudu/Desktop/IOS/utils/audioFiles/CardiacArrestES.mp3",
     };
     this.currentAudioFile = null;
     this.currentProcess = null;
-    this.languageUsed = null; // ✅ stores selected language
+    this.languageUsed = null;
 
     this.isPaused = false;
-    this.pausedTime = 0; // Track paused time in seconds
-    this.startTime = 0; // Track start time in seconds
-
-    // 🔹 Added for audio duration limit
-    this.playedTime = 0;
-    this.maxDuration = 608; // 10:08 in seconds
+    this.playedTime = 0;       // total seconds played so far
+    this.segmentStart = null;  // wall-clock time when current segment started
+    this.maxDuration = 608;
     this._durationTicker = null;
   }
 
-  _startDurationTicker() {
-    if (this._durationTicker) return;
-    this._durationTicker = setInterval(async () => {
-      let elapsed = this.playedTime;
-      if (!this.isPaused && this.startTime) {
-        elapsed += Date.now() / 1000 - this.startTime;
+  // ─── Internal helpers ────────────────────────────────────────────────
+
+  _killCurrentProcess() {
+    try {
+      if (this.currentProcess) {
+        this.currentProcess.kill("SIGKILL");
+        this.currentProcess = null;
       }
+    } catch (e) {
+      console.warn("Could not kill process:", e.message);
+    }
+  }
+
+  _accumulatePlayedTime() {
+    // Add time elapsed in the current playing segment
+    if (!this.isPaused && this.segmentStart !== null) {
+      this.playedTime += Date.now() / 1000 - this.segmentStart;
+      this.segmentStart = null;
+    }
+  }
+
+  _startDurationTicker() {
+    if (this._durationTicker) {
+      clearInterval(this._durationTicker);
+    }
+    this._durationTicker = setInterval(async () => {
+      const elapsed = this.playedTime +
+        (!this.isPaused && this.segmentStart
+          ? Date.now() / 1000 - this.segmentStart
+          : 0);
+
       if (elapsed >= this.maxDuration) {
         clearInterval(this._durationTicker);
         this._durationTicker = null;
         await this.stopAudio();
         console.log("Audio auto-stopped at 10:08 (608 sec)");
       }
-    }, 1000);
+    }, 500); // check every 500ms for tighter accuracy
   }
 
-
-  async playAudio(language) {
-    const audioFilePath = this.audioFiles[language];
-    this.languageUsed = language; // ✅ remember language
-
-    if (this.isPaused && this.currentProcess) {
-      this.currentProcess = spawn("afplay", [
-        "-t",
-        String(Number.MAX_SAFE_INTEGER),
-        "-ss",
-        String(this.pausedTime),
-        audioFilePath,
-      ]);
-      this.currentProcess.on("error", (err) => {
-        console.error("Failed to resume afplay:", err);
-      });
-      this.startTime = Date.now() / 1000;
-      this.isPaused = false;
-      this._startDurationTicker(); // 🔹 start ticker on resume
-      return audioFilePath;
-    } else {
-      if (this.currentProcess) {
-        await this.stopAudio();
-      }
-      this.currentAudioFile = audioFilePath;
-      this.currentProcess = spawn("afplay", [audioFilePath]);
-      this.currentProcess.on("error", (err) => {
-        console.error("Failed to start afplay:", err);
-      });
-      this.startTime = Date.now() / 1000;
-      this.isPaused = false;
-      this._startDurationTicker(); // 🔹 start ticker on play
-      return this.currentAudioFile;
-    }
-  }
-
-  async pauseAudio() {
-    if (this.currentProcess && !this.isPaused) {
-      this.playedTime += Date.now() / 1000 - this.startTime; // 🔹 accumulate playback
-      this.pausedTime = this.playedTime;
-
-      const { stdout } = await execPromise("pgrep afplay || true");
-      if (stdout.trim()) {
-        await execPromise("pkill -STOP afplay");
-        this.isPaused = true;
-      }
-    }
-  }
-  async resumeAudio() {
-    if (this.currentProcess && this.isPaused) {
-      await execPromise("pkill -CONT afplay");
-      this.startTime = Date.now() / 1000;
-      this.isPaused = false;
-      this._startDurationTicker(); // 🔹 restart ticker
-    }
-  }
-
-  async stopAudio() {
-    const language = this.languageUsed;
-    if (this.currentProcess) {
-      const { stdout } = await execPromise("pgrep afplay || true");
-      if (stdout.trim()) {
-        await execPromise("killall afplay");
-      }
-      this.currentProcess = null;
-    }
-    // 🔹 Final played time update
-    if (!this.isPaused && this.startTime) {
-      this.playedTime += Date.now() / 1000 - this.startTime;
-    }
-
-    // Load full transcript (linked to current audio)
-    const transcriptMap = {
-      english:
-        "/Users/nagasubarayudu/Desktop/IOS/utils/audiotranscripts/CardiacArrest.txt",
-      spanish:
-        "/Users/nagasubarayudu/Desktop/IOS/utils/audiotranscripts/CardiacArrestEs.txt",
-    };
-
-    const transcriptPath = transcriptMap[language];
-    const fullTranscript = fs
-      .readFileSync(transcriptPath, "utf8")
-      .trim()
-      .split(/\s+/);
-
-    // Approximate slice of transcript
-    const wordsPerSecond = fullTranscript.length / this.maxDuration;
-    const wordsToTake = Math.floor(this.playedTime * wordsPerSecond);
-
-    const partialTranscript = fullTranscript.slice(0, wordsToTake).join(" ");
-
-    // Save to .txt file
-    const logDir = "/Users/nagasubarayudu/Desktop/IOS/utils/audioLogs";
-    if (!fs.existsSync(logDir)) {
-      fs.mkdirSync(logDir, { recursive: true });
-    }
-
-    const logFile = `${logDir}/played_audio_${Date.now()}.txt`;
-    fs.writeFileSync(logFile, partialTranscript, "utf8");
-
-    console.log("Transcript of played audio saved to:", logFile);
-
-    // Reset state
-    this.isPaused = false;
-    this.pausedTime = 0;
-    this.startTime = 0;
-    this.playedTime = 0;
+  _stopTicker() {
     if (this._durationTicker) {
       clearInterval(this._durationTicker);
       this._durationTicker = null;
     }
+  }
+
+  // Spawn ffplay starting at `seekSeconds` into the file
+  _spawnFfplay(filePath, seekSeconds = 0) {
+    // ffplay flags:
+    //   -nodisp       no video window
+    //   -autoexit     exit when audio ends
+    //   -ss           seek to position in seconds
+    const args = [
+      "-nodisp",
+      "-autoexit",
+      "-ss", String(seekSeconds.toFixed(3)),
+      filePath,
+    ];
+    const proc = spawn("ffplay", args, { stdio: "ignore" });
+    proc.on("error", (err) => console.error("ffplay error:", err));
+    return proc;
+  }
+
+  // ─── Public API ──────────────────────────────────────────────────────
+
+  async playAudio(language) {
+    // Stop anything currently playing
+    if (this.currentProcess) {
+      await this.stopAudio();
+    }
+
+    const audioFilePath = this.audioFiles[language];
+    this.languageUsed = language;
+    this.currentAudioFile = audioFilePath;
+    this.playedTime = 0;
+    this.isPaused = false;
+
+    this.currentProcess = this._spawnFfplay(audioFilePath, 0);
+    this.segmentStart = Date.now() / 1000;
+    this._startDurationTicker();
+
+    return audioFilePath;
+  }
+
+  async pauseAudio() {
+    if (!this.currentProcess || this.isPaused) return;
+
+    // 1. Accumulate how long we've played in this segment
+    this._accumulatePlayedTime();
+
+    // 2. Kill the ffplay process — no buffer drain, stops immediately
+    this._killCurrentProcess();
+
+    this.isPaused = true;
+    this._stopTicker();
+
+    console.log(`Audio paused at ${this.playedTime.toFixed(2)}s`);
+  }
+
+  async resumeAudio() {
+    if (!this.isPaused || !this.currentAudioFile) return;
+
+    // Spawn a fresh ffplay seeking exactly to where we paused
+    this.currentProcess = this._spawnFfplay(this.currentAudioFile, this.playedTime);
+    this.segmentStart = Date.now() / 1000;
+    this.isPaused = false;
+    this._startDurationTicker();
+
+    console.log(`Audio resumed from ${this.playedTime.toFixed(2)}s`);
+  }
+
+  async stopAudio() {
+    const language = this.languageUsed;
+
+    // Accumulate remaining time before killing
+    this._accumulatePlayedTime();
+    this._killCurrentProcess();
+    this._stopTicker();
+
+    // Also kill any stray ffplay processes
+    try {
+      const { stdout } = await execPromise("pgrep ffplay || true");
+      if (stdout.trim()) await execPromise("killall ffplay");
+    } catch (e) { /* ignore */ }
+
+    this.isPaused = false;
+
+    // ── Transcript slicing ──────────────────────────────────────────
+    const transcriptMap = {
+      english: "/Users/nagasubarayudu/Desktop/IOS/utils/audiotranscripts/CardiacArrest.txt",
+      spanish: "/Users/nagasubarayudu/Desktop/IOS/utils/audiotranscripts/CardiacArrestEs.txt",
+    };
+
+    if (!language || !transcriptMap[language]) {
+      console.warn("No language set, skipping transcript save.");
+      return null;
+    }
+
+    const fullTranscript = fs
+      .readFileSync(transcriptMap[language], "utf8")
+      .trim()
+      .split(/\s+/);
+
+    const wordsPerSecond = fullTranscript.length / this.maxDuration;
+    const wordsToTake = Math.min(
+      Math.floor(this.playedTime * wordsPerSecond),
+      fullTranscript.length
+    );
+    const partialTranscript = fullTranscript.slice(0, wordsToTake).join(" ");
+
+    const logDir = "/Users/nagasubarayudu/Desktop/IOS/utils/audioLogs";
+    if (!fs.existsSync(logDir)) fs.mkdirSync(logDir, { recursive: true });
+
+    const logFile = `${logDir}/played_audio_${Date.now()}.txt`;
+    fs.writeFileSync(logFile, partialTranscript, "utf8");
+    console.log("Transcript saved to:", logFile);
+
+    // Reset state
+    this.playedTime = 0;
+    this.segmentStart = null;
+
     return logFile;
   }
 
+  // ─── Text comparison (unchanged logic, typo fixed) ───────────────────
 
   async TextComparison() {
     const SCANNED_DIR = "/Users/nagasubarayudu/Desktop/IOS/_results_/";
-    const PLAYED_DIR = "/Users/nagasubarayudu/Desktop/IOS/utils/audioLogs/";
+    const PLAYED_DIR  = "/Users/nagasubarayudu/Desktop/IOS/utils/audioLogs/";
 
-    const normalizeText = (text) => {
-      return text
+    const normalizeText = (text) =>
+      text
         .replace(/--+\s*Conversation\s*\d+\s*--+/gi, " ")
         .replace(/[^a-zA-Z0-9\s]/g, "")
         .replace(/\s+/g, " ")
         .trim()
         .toLowerCase();
-    };
 
-    const deduplicateText = (text) => {
-      const lines = text
-        .split(/\n+/)
-        .map((l) => l.trim())
-        .filter(Boolean);
-      return [...new Set(lines)].join(" ");
-    };
+    const deduplicateText = (text) =>
+      [...new Set(text.split(/\n+/).map((l) => l.trim()).filter(Boolean))].join(" ");
 
     const getLatestFile = (dir, prefix) => {
       const files = fs
         .readdirSync(dir)
         .filter((f) => f.startsWith(prefix) && f.endsWith(".txt"))
         .sort((a, b) => b.localeCompare(a));
-
-      if (!files.length)
-        throw new Error(`No files found with prefix ${prefix} in ${dir}`);
+      if (!files.length) throw new Error(`No files with prefix ${prefix} in ${dir}`);
       return path.join(dir, files[0]);
     };
+
     const scannedFile = getLatestFile(SCANNED_DIR, "scanned_texts_");
-    const playedFile = getLatestFile(PLAYED_DIR, "played_audio_");
+    const playedFile  = getLatestFile(PLAYED_DIR, "played_audio_");
 
-    const scannedRaw = fs.readFileSync(scannedFile, "utf8");
-    const playedRaw = fs.readFileSync(playedFile, "utf8");
-
-    const scannedText = normalizeText(deduplicateText(scannedRaw));
-    const playedText = normalizeText(playedRaw);
+    const scannedText = normalizeText(deduplicateText(fs.readFileSync(scannedFile, "utf8")));
+    const playedText  = normalizeText(fs.readFileSync(playedFile, "utf8"));
 
     const playedSlice = playedText.slice(0, scannedText.length);
-
-    const distance = levenshtein.get(scannedText, playedSlice);
-    const maxLen = Math.max(scannedText.length, playedSlice.length) || 1;
-    const similarity = ((1 - distance / maxLen) * 100).toFixed(2);
+    const distance    = levenshtein.get(scannedText, playedSlice);
+    const maxLen      = Math.max(scannedText.length, playedSlice.length) || 1;
+    const similarity  = ((1 - distance / maxLen) * 100).toFixed(2);
 
     const threshold = 90;
-    const status = similarity >= threshold ? "Match Pass" : "Match Fail";
+    const status    = similarity >= threshold ? "Match Pass" : "Match Fail";
 
     allureReporter.addAttachment("Scanned Text", scannedText, "text/plain");
-    allureReporter.addAttachment("Played Text", playedText, "text/plain");
-   
- 
+    allureReporter.addAttachment("Played Text",  playedText,  "text/plain");
 
     if (similarity < threshold) {
       allureReporter.addDescription(
-        "the thrusg=h hold we got less then 85% check over it"
+        `Similarity ${similarity}% is below the ${threshold}% threshold — please review the transcript.`
       );
     }
 
-    return {
-      scannedFile,
-      playedFile,
-      similarity: `${similarity}%`,
-      status,
-    };
+    return { scannedFile, playedFile, similarity: `${similarity}%`, status };
   }
 }
 

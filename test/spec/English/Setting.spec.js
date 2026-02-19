@@ -13,13 +13,13 @@ it.skip("Verify Settings screen Profille Edit #Skipped:-proffile edit is skipped
   await verifyAndClick(HomePage.settings);
   await SettingsPage.profileSettingScreen();
 });
-it("Verify Settings screen support_Verification ", async () => {
+it("Verify Setting's screen support_Verification ", async () => {
   await SettingsPage.support_VerifiCation();
 });
 
-it("Verify  launguag change option", async () => {
+it("Verify Setting's screen launguage and general settings", async () => {
   await SettingsPage.launguageChange();
 });
-it("Verify  general settings ", async () => {
+it("Verify Setting's screen general settings ", async () => {
   await SettingsPage.generalSettingsUpdate();
 });

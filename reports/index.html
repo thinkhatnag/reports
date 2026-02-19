@@ -1,309 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="NOKI iOS Mobile Test Reports">
-    <title>Test Reports - NOKI iOS</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
-        
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 16px;
-            padding: 50px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 30px;
-            border-bottom: 2px solid #e5e7eb;
-        }
-        
-        .logo {
-            font-size: 60px;
-            margin-bottom: 15px;
-        }
-        
-        h1 {
-            color: #1f2937;
-            font-size: 36px;
-            margin-bottom: 10px;
-        }
-        
-        .subtitle {
-            color: #6b7280;
-            font-size: 18px;
-        }
-        
-        .section-title {
-            font-size: 24px;
-            color: #1f2937;
-            margin: 40px 0 20px 0;
-            padding-left: 15px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .reports-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-        
-        .report-card {
-            display: block;
-            padding: 30px;
-            background: #f9fafb;
-            border-radius: 12px;
-            text-decoration: none;
-            color: #1f2937;
-            border: 2px solid #e5e7eb;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .report-card:hover {
-            border-color: #667eea;
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
-            background: white;
-        }
-        
-        .report-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
-            display: block;
-        }
-        
-        .report-title {
-            font-weight: 600;
-            font-size: 20px;
-            margin-bottom: 10px;
-            color: #1f2937;
-        }
-        
-        .report-description {
-            color: #6b7280;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-        
-        .report-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            background: #10b981;
-            color: white;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .report-badge.primary { background: #667eea; }
-        
-        .info-box {
-            background: #f9fafb;
-            padding: 25px;
-            border-radius: 8px;
-            border-left: 4px solid #10b981;
-            margin: 30px 0;
-        }
-        
-        .info-box h3 {
-            color: #1f2937;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        
-        .info-box ul {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .info-box li {
-            padding: 8px 0;
-            color: #4b5563;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        
-        .info-box li strong {
-            color: #1f2937;
-            font-weight: 600;
-        }
-        
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-        
-        .stat-box {
-            text-align: center;
-            padding: 20px;
-            background: #f9fafb;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-        }
-        
-        .stat-label {
-            color: #6b7280;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        
-        .stat-value {
-            font-size: 28px;
-            font-weight: bold;
-            color: #1f2937;
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 50px;
-            padding-top: 30px;
-            border-top: 1px solid #e5e7eb;
-            color: #6b7280;
-            font-size: 14px;
-        }
-        
-        .last-updated {
-            text-align: center;
-            color: #9ca3af;
-            font-size: 13px;
-            margin-top: 15px;
-            font-style: italic;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 30px 20px;
-            }
-            
-            h1 {
-                font-size: 28px;
-            }
-            
-            .reports-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Test Reports Dashboard</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f8f9fb;color:#1a202c;padding:40px 20px;min-height:100vh}
+.page{max-width:900px;margin:0 auto}
+.hdr{text-align:center;margin-bottom:40px}
+.hdr h1{font-size:32px;font-weight:700;font-family:"Courier New",monospace;margin-bottom:10px;color:#1a202c}
+.hdr p{font-size:14px;color:#4a5568;font-family:"Courier New",monospace}
+.reports{display:grid;gap:16px}
+.card{background:#ffffff;border:1px solid #d4d9e1;border-radius:10px;padding:24px 28px;transition:all .2s;cursor:pointer;text-decoration:none;display:block}
+.card:hover{border-color:#b0b8c8;background:#f4f6f8;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-title{font-size:18px;font-weight:600;color:#1a202c;font-family:"Courier New",monospace}
+.card-icon{font-size:24px;color:#4a5568}
+.card-meta{font-size:12px;color:#4a5568;font-family:"Courier New",monospace;margin-bottom:14px}
+.card-stats{display:flex;gap:14px;flex-wrap:wrap}
+.stat{display:flex;align-items:center;gap:6px;font-size:13px;font-family:"Courier New",monospace}
+.stat-dot{width:8px;height:8px;border-radius:50%}
+.stat.total .stat-dot{background:#2563eb}
+.stat.pass .stat-dot{background:#16a34a}
+.stat.fail .stat-dot{background:#dc2626}
+.stat.skip .stat-dot{background:#d97706}
+.stat-val{font-weight:700}
+.stat.total{color:#4a5568}
+.stat.pass{color:#16a34a}
+.stat.fail{color:#dc2626}
+.stat.skip{color:#d97706}
+.footer{margin-top:60px;text-align:center;font-size:12px;color:#a0aec0;font-family:"Courier New",monospace}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="logo">📊</div>
-            <h1>Test Reports</h1>
-            <p class="subtitle">Mobile Test Reports</p>
-        </div>
-        
-        <h2 class="section-title">🌐 View Reports</h2>
-        
-        <div class="reports-grid">
-            <a href="test-report.html" class="report-card">
-                <span class="report-icon">🚀</span>
-                <div class="report-title">Custom Language Report</div>
-                <div class="report-description">
-                    Interactive test report with English/Spanish comparison, editable comments, and CSV export
-                </div>
-                <span class="report-badge primary">RECOMMENDED</span>
-            </a>
-            
-            <a href="html-reports/report.html" class="report-card">
-                <span class="report-icon">📄</span>
-                <div class="report-title">Standard WebdriverIO Report</div>
-                <div class="report-description">
-                    Detailed HTML report with complete test execution logs and screenshots
-                </div>
-                <span class="report-badge">DETAILED</span>
-            </a>
-        </div>
-        
-        <h2 class="section-title">📋 Reports Included</h2>
-        
-        <div class="info-box">
-            <h3>Available Reports:</h3>
-            <ul>
-                <li><strong>index.html</strong> - Landing page / Latest report (this page)</li>
-                <li><strong>test-report.html</strong> - Custom language comparison report</li>
-                <li><strong>html-reports/</strong> - Standard WebdriverIO reports</li>
-            </ul>
-        </div>
-        
-        <h2 class="section-title">📈 Latest Test Run</h2>
-        
-        <div class="stats">
-            <div class="stat-box">
-                <div class="stat-label">Total Tests</div>
-                <div class="stat-value" id="totalTests">-</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Platform</div>
-                <div class="stat-value" style="font-size: 20px;">iOS</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Environment</div>
-                <div class="stat-value" style="font-size: 20px;">PROD</div>
-            </div>
-        </div>
-        
-        <div class="footer">
-            <p><strong>Automated Mobile Testing Report</strong></p>
-            <p style="margin-top: 10px;">WebdriverIO + Appium + Allure</p>
-            <p class="last-updated">
-                Last updated: <span id="lastUpdated"></span><br>
-                Auto-generated by test automation
-            </p>
-        </div>
+<div class="page">
+<div class="hdr">
+  <h1>📊 Test Reports Dashboard</h1>
+  <p>iOS Mobile Testing — WebdriverIO + Appium + Allure</p>
+</div>
+<div class="reports">
+  <a href="test-report-v2.html" class="card">
+    <div class="card-top">
+      <div class="card-title">📱 Latest Test Run</div>
+      <div class="card-icon">→</div>
     </div>
-    
-    <script>
-        // Set last updated date
-        const now = new Date();
-        const options = { 
-            weekday: 'short', 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric', 
-            hour: '2-digit', 
-            minute: '2-digit', 
-            second: '2-digit',
-            timeZoneName: 'short'
-        };
-        document.getElementById('lastUpdated').textContent = now.toLocaleString('en-US', options);
-        
-        // Try to extract stats from test-report.html
-        fetch('test-report.html')
-            .then(response => response.text())
-            .then(html => {
-                // Try to find the total tests count
-                const match = html.match(/<div class="value">(\d+)<\/div>/);
-                if (match && match[1]) {
-                    document.getElementById('totalTests').textContent = match[1];
-                }
-            })
-            .catch(() => {
-                document.getElementById('totalTests').textContent = 'N/A';
-            });
-    </script>
+    <div class="card-meta">Generated: 2/19/2026, 3:01:59 PM</div>
+    <div class="card-stats">
+      <div class="stat total"><span class="stat-dot"></span><span class="stat-val">110</span> total</div>
+      <div class="stat pass"><span class="stat-dot"></span><span class="stat-val">95</span> passed</div>
+      <div class="stat fail"><span class="stat-dot"></span><span class="stat-val">14</span> failed</div>
+      <div class="stat skip"><span class="stat-dot"></span><span class="stat-val">1</span> skipped</div>
+    </div>
+  </a>
+</div>
+<div class="footer">
+  Automated Test Reporting • v2.0
+</div>
+</div>
 </body>
 </html>

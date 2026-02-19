@@ -4,16 +4,16 @@ beforeEach(() => {
   allureReporter.addSubSuite("Settings screen");
 });
 
-it.skip("Verify Settings screen Profille Edit ", async () => {
+it.skip("Verify Settings screen Profille Edit #Skipped:-proffile edit is skipped due to Known Issue, related to Api change", async () => {
   await SpanishLanguage.profileSettingScreen();
 });
-it("Verify Settings screen support verification ", async () => {
+it("Verify Setting's screen support_Verification ", async () => {
   await SpanishLanguage.support_VerifiCation();
 });
 
-it("Verify Settings screen launguage and general settings", async () => {
+it("Verify Setting's screen launguage and general settings", async () => {
   await SpanishLanguage.launguageChange();
 });
-it("Verify Settings screen general settings", async () => {
+it("Verify Setting's screen general settings", async () => {
   await SpanishLanguage.generalSettingsUpdate();
 });

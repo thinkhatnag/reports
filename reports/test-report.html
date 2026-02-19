@@ -1,2475 +1,379 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobile Test Report - 2/17/2026, 5:33:49 PM</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-        }
-        .header h1 { margin-bottom: 10px; font-size: 28px; }
-        .header p { opacity: 0.9; font-size: 14px; }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 30px;
-            background: #f9fafb;
-        }
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .stat-card.passed { border-left-color: #10b981; }
-        .stat-card.failed { border-left-color: #ef4444; }
-        .stat-card.skipped { border-left-color: #f59e0b; }
-        .stat-card h3 {
-            color: #6b7280;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-        .stat-card .value {
-            font-size: 32px;
-            font-weight: bold;
-            color: #1f2937;
-        }
-        .test-table-section { padding: 30px; }
-        .test-table-section h2 {
-            margin-bottom: 20px;
-            color: #1f2937;
-            font-size: 20px;
-        }
-            .retry-badge {
-    margin-left: 8px;
-    padding: 2px 6px;
-    background: #6366f1;
-    color: white;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weigh
-    letter-spacing: 0.5px;
-}
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>iOS Test Report</title>
+<style>
 
-        .save-indicator {
-            display: inline-block;
-            margin-left: 10px;
-            padding: 4px 12px;
-            background: #10b981;
-            color: white;
-            border-radius: 4px;
-            font-size: 12px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .save-indicator.show { opacity: 1; }
-        .legend {
-            margin-top: 20px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f9fafb;
-            border-radius: 4px;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            border: 1px solid #e5e7eb;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-        .legend-item span { font-weight: 600; }
-        .legend-item.passed span { color: #10b981; }
-        .legend-item.failed span { color: #ef4444; }
-        .legend-item.skipped span { color: #f59e0b; }
-        .legend-item.not-run span { color: #9ca3af; }
-        .test-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .test-table thead { background: #f9fafb; }
-        .test-table th {
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            color: #374151;
-            border-bottom: 2px solid #e5e7eb;
-            font-size: 14px;
-            text-transform: uppercase;
-        }
-        .test-table td {
-            padding: 15px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .test-table tbody tr:hover { background: #f9fafb; }
-        .test-name {
-            font-weight: 500;
-            color: #1f2937;
-            max-width: 400px;
-        }
-        .status { font-weight: 600; font-size: 14px; }
-        .status.passed { color: #10b981; }
-        .status.failed { color: #ef4444; }
-        .status.skipped { color: #f59e0b; }
-        .status.not-run { color: #9ca3af; }
-        .comment-cell { min-width: 250px; }
-        .comment-input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .comment-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        .details {
-            padding: 30px;
-            border-top: 1px solid #e5e7eb;
-        }
-        .details h2 {
-            margin-bottom: 20px;
-            color: #1f2937;
-        }
-        .info-grid { display: grid; gap: 10px; }
-        .info-row {
-            display: grid;
-            grid-template-columns: 200px 1fr;
-            padding: 12px;
-            background: #f9fafb;
-            border-radius: 4px;
-        }
-        .info-label { font-weight: 600; color: #6b7280; }
-        .info-value { color: #1f2937; }
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #6b7280;
-            font-size: 14px;
-            border-top: 1px solid #e5e7eb;
-        }
-        .export-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .export-btn:hover { background: #5568d3; }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 15px;
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .back-link:hover { background: rgba(255,255,255,0.3); }
-    </style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f9fb;--sf:#ffffff;--sf2:#f4f6f8;--sf3:#e8ebf0;
+  --bd:#d4d9e1;--bd2:#b0b8c8;
+  --tx:#1a202c;--txm:#4a5568;--txd:#cbd5e0;
+  --pass:#16a34a;--pass-bg:rgba(22,163,74,.08);
+  --fail:#dc2626;--fail-bg:rgba(220,38,38,.08);
+  --skip:#d97706;--skip-bg:rgba(217,119,6,.08);
+  --nr:#64748b;--nr-bg:rgba(100,116,139,.08);
+  --issue:#d97706;--iss-bg:rgba(217,119,6,.12);
+  --acc:#2563eb;
+  --r:6px;--rl:10px;
+  --mono:'Courier New',monospace;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);padding:20px;min-height:100vh}
+.page{max-width:1300px;margin:0 auto}
+.hdr{padding:22px 26px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);margin-bottom:14px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.hdr h1{font-size:19px;font-weight:700;letter-spacing:-.3px;font-family:var(--mono)}
+.hdr h1 span{color:var(--acc)}
+.hdr-meta{margin-top:5px;font-size:11px;color:var(--txm);font-family:var(--mono)}
+.back{font-size:11px;color:var(--txm);text-decoration:none;border:1px solid var(--bd);padding:5px 11px;border-radius:var(--r);transition:.15s}
+.back:hover{color:var(--tx);border-color:var(--bd2)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:15px 16px;position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--acc);border-radius:var(--rl) var(--rl) 0 0}
+.sc.p::before{background:var(--pass)}.sc.f::before{background:var(--fail)}.sc.s::before{background:var(--skip)}
+.sc-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--txm);margin-bottom:6px;font-family:var(--mono)}
+.sc-val{font-size:32px;font-weight:700;font-family:var(--mono);line-height:1}
+.sc.p .sc-val{color:var(--pass)}.sc.f .sc-val{color:var(--fail)}.sc.s .sc-val{color:var(--skip)}
+.legend{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:10px 16px;margin-bottom:10px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.leg-ttl{font-size:10px;font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--txm);margin-right:4px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txm)}
+.lb{display:inline-flex;align-items:center;justify-content:center;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700;font-family:var(--mono)}
+.lb.p{background:var(--pass-bg);color:var(--pass);border:1px solid var(--pass)}
+.lb.f{background:var(--fail-bg);color:var(--fail);border:1px solid var(--fail)}
+.lb.s{background:var(--skip-bg);color:var(--skip);border:1px solid var(--skip)}
+.lb.nr{background:var(--nr-bg);color:var(--nr);border:1px solid var(--nr)}
+.lb.iss{background:var(--iss-bg);color:var(--issue);border:1px solid var(--issue);font-weight:900;width:17px;height:17px;padding:0;border-radius:50%;font-size:11px}
+.toolbar{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:space-between}
+.fg,.eg{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.flbl{font-size:10px;color:var(--txm);font-family:var(--mono);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-right:2px}
+.fbtn{padding:4px 11px;border-radius:100px;border:1px solid var(--bd);background:transparent;color:var(--txm);font-size:11px;font-family:var(--mono);font-weight:700;cursor:pointer;transition:.15s}
+.fbtn:hover{border-color:var(--bd2);color:var(--tx)}
+.fbtn.on{background:var(--sf3);color:var(--tx);border-color:var(--bd2)}
+.fbtn[data-f="passed"].on{background:var(--pass-bg);color:var(--pass);border-color:var(--pass)}
+.fbtn[data-f="failed"].on{background:var(--fail-bg);color:var(--fail);border-color:var(--fail)}
+.fbtn[data-f="skipped"].on{background:var(--skip-bg);color:var(--skip);border-color:var(--skip)}
+.fbtn[data-f="notrun"].on{background:var(--nr-bg);color:var(--nr);border-color:var(--nr)}
+.fbtn[data-f="issue"].on{background:var(--iss-bg);color:var(--issue);border-color:var(--issue)}
+.cbtn{padding:4px 11px;border-radius:var(--r);border:1px solid var(--bd);background:transparent;color:var(--txm);font-size:11px;font-family:var(--mono);cursor:pointer;transition:.15s}
+.cbtn:hover{border-color:var(--bd2);color:var(--tx);background:var(--sf2)}
+.sind{font-size:10px;font-family:var(--mono);color:var(--pass);opacity:0;margin-left:6px;transition:opacity .3s}
+.sind.show{opacity:1}
+.suites{display:flex;flex-direction:column;gap:7px}
+.sblock{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);overflow:hidden;transition:border-color .15s}
+.sblock:hover{border-color:var(--bd2)}
+.sblock.gone{display:none}
+.shdr{display:flex;align-items:center;gap:11px;padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s;flex-wrap:wrap}
+.shdr:hover{background:var(--sf2)}
+.chev{width:16px;height:16px;flex-shrink:0;color:var(--txm);transition:transform .2s;display:flex;align-items:center;justify-content:center}
+.sblock.open .chev{transform:rotate(90deg)}
+.sname{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--tx);flex:1;min-width:0;word-break:break-word}
+.pills-c,.pills-e{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.sblock.open .pills-c{display:none}
+.pills-e{display:none}
+.sblock.open .pills-e{display:flex}
+.pill{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:100px;font-size:10px;font-weight:700;font-family:var(--mono)}
+.pill.t{background:var(--sf3);color:var(--txm);border:1px solid var(--bd)}
+.pill.p{background:var(--pass-bg);color:var(--pass);border:1px solid rgba(31,209,122,.2)}
+.pill.f{background:var(--fail-bg);color:var(--fail);border:1px solid rgba(240,80,110,.2)}
+.pill.s{background:var(--skip-bg);color:var(--skip);border:1px solid rgba(245,192,67,.2)}
+.sbody{display:none;border-top:1px solid var(--bd)}
+.sblock.open .sbody{display:block}
+.ttbl{width:100%;border-collapse:collapse}
+.ttbl thead th{padding:8px 14px;text-align:left;font-size:10px;font-weight:700;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--txm);background:var(--sf2);border-bottom:1px solid var(--bd)}
+.ttbl tbody tr{border-bottom:1px solid var(--bd);transition:background .1s}
+.ttbl tbody tr:last-child{border-bottom:none}
+.ttbl tbody tr:hover{background:var(--sf2)}
+.ttbl tbody tr.hide{display:none}
+.ttbl td{padding:10px 14px;vertical-align:middle}
+.tname{font-size:12px;color:var(--tx);font-weight:500;min-width:200px;max-width:370px;word-break:break-word;line-height:1.5}
+.iss-wrap{display:inline-block;position:relative;vertical-align:middle;margin-left:6px}
+.ib{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--iss-bg);border:1.5px solid var(--issue);color:var(--issue);font-size:10px;font-weight:900;cursor:pointer;flex-shrink:0;text-decoration:none;transition:background .15s}
+.ib:hover,.ib.open{background:rgba(245,192,67,.32)}
+.iss-drop{display:none;position:absolute;left:0;top:calc(100% + 5px);min-width:220px;max-width:340px;background:#ffffff;border:1px solid var(--issue);border-radius:6px;z-index:40;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+.iss-drop.show{display:block}
+.iss-drop-hdr{display:flex;align-items:center;justify-content:space-between;padding:7px 10px 5px;border-bottom:1px solid rgba(245,192,67,.2)}
+.iss-drop-title{font-size:10px;font-weight:700;font-family:'Courier New',monospace;color:var(--issue);text-transform:uppercase;letter-spacing:.5px}
+.iss-drop-close{font-size:12px;color:var(--txm);cursor:pointer;line-height:1;padding:0 2px}
+.iss-drop-close:hover{color:var(--tx)}
+.iss-drop-body{padding:8px 10px}
+.iss-drop-text{font-size:11px;color:#422006;font-family:'Courier New',monospace;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.iss-drop-link{display:inline-block;margin-top:6px;font-size:10px;color:var(--acc);text-decoration:none;font-family:'Courier New',monospace}
+.iss-drop-link:hover{text-decoration:underline}
+.sb{display:inline-flex;align-items:center;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700;font-family:var(--mono);white-space:nowrap}
+.sb.passed{background:var(--pass-bg);color:var(--pass);border:1px solid rgba(31,209,122,.25)}
+.sb.failed{background:var(--fail-bg);color:var(--fail);border:1px solid rgba(240,80,110,.25);cursor:help;position:relative}
+.sb.skipped{background:var(--skip-bg);color:var(--skip);border:1px solid rgba(245,192,67,.25)}
+.sb.not-run{background:var(--nr-bg);color:var(--nr);border:1px solid rgba(62,77,122,.25)}
+.err-tip{display:none;position:absolute;left:0;top:calc(100% + 5px);min-width:220px;max-width:340px;background:#ffffff;color:#991b1b;border:1px solid rgba(220,38,38,.35);padding:7px 10px;border-radius:6px;font-size:10px;white-space:pre-wrap;word-break:break-word;z-index:30;font-weight:400;line-height:1.5;pointer-events:none;font-family:'Courier New',monospace;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.sb.failed:hover .err-tip{display:block}
+.ci{width:100%;min-width:150px;padding:5px 9px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:11px;transition:.15s}
+.ci:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 2px rgba(79,127,255,.12)}
+.nores{text-align:center;padding:40px;color:var(--txm);font-family:var(--mono);font-size:12px;display:none}
+.nores.show{display:block}
+.exp-row{margin-top:12px;display:flex;gap:10px;align-items:center}
+.exp-btn{padding:7px 18px;background:var(--acc);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;font-family:var(--mono);cursor:pointer;transition:opacity .15s}
+.exp-btn:hover{opacity:.85}
+.footer{margin-top:28px;text-align:center;font-size:11px;font-family:var(--mono);color:var(--txd)}
+
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <a href="index.html" class="back-link">← Back to Dashboard</a>
-            <h1>🚀 Mobile Test Report</h1>
-            <p>Platform: <span id="platform"></span> | Generated: <span id="reportDate"></span></p>
-            <p style="margin-top: 5px; font-size: 12px;">Standalone Report - All Data Embedded</p>
-        </div>
-        <div class="stats">
-            <div class="stat-card">
-                <h3>Total Tests</h3>
-                <div class="value" id="statTotal">0</div>
-            </div>
-            <div class="stat-card passed">
-                <h3>✓ Passed</h3>
-                <div class="value" style="color: #10b981;" id="statPassed">0</div>
-            </div>
-            <div class="stat-card failed">
-                <h3>✗ Failed</h3>
-                <div class="value" style="color: #ef4444;" id="statFailed">0</div>
-            </div>
-            <div class="stat-card skipped">
-                <h3>⊗ Skipped</h3>
-                <div class="value" style="color: #f59e0b;" id="statSkipped">0</div>
-            </div>
-        </div>
-        <div class="test-table-section">
-            <h2>Test Cases Detail <span class="save-indicator" id="saveIndicator">✓ Saved</span></h2>
-            <div class="legend">
-                <div class="legend-item passed"><span>✓ PASS</span> - Test Passed</div>
-                <div class="legend-item failed"><span>✗ FAIL</span> - Test Failed</div>
-                <div class="legend-item skipped"><span>⊗ SKIPPED</span> - Test Skipped</div>
-                <div class="legend-item not-run"><span>- NOT RUN</span> - Test Not Executed</div>
-            </div>
-            <table class="test-table">
-                <thead>
-                    <tr>
-                        <th>Test Case</th>
-                        <th>English</th>
-                        <th>Spanish</th>
-                        <th>Comments</th>
-                    </tr>
-                </thead>
-                <tbody id="testTableBody">
-                </tbody>
-            </table>
-            <button class="export-btn" onclick="exportToCSV()">📥 Export to CSV</button>
-        </div>
-        <div class="details">
-            <h2>Test Execution Details</h2>
-            <div class="info-grid">
-                <div class="info-row">
-                    <div class="info-label">Platform:</div>
-                    <div class="info-value" id="detailPlatform"></div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Report Generated:</div>
-                    <div class="info-value" id="detailGenerated"></div>
-                </div>
-            </div>
-        </div>
-        <div class="footer">
-            <p>Automated Mobile Testing Report - WebdriverIO + Appium + Allure</p>
-        </div>
-    </div>
-    
-    <script>
-        // Embedded test data
-        const REPORT_DATA = {
-  "testCases": [
-    {
-      "name": "App Killed and Reopened (Offline Mode Verification) for the First Encounter -Es",
-      "baseTestName": "App Killed and Reopened (Offline Mode Verification) for the First Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 5098,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "App Killed in Offline and Reopened in Online Mode Verification for the First Encounter -Es",
-      "baseTestName": "App Killed in Offline and Reopened in Online Mode Verification for the First Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 65002,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "Offline Mode Stop and App Kill Verification for the First Encounter -Es",
-      "baseTestName": "Offline Mode Stop and App Kill Verification for the First Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 73723,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "App Killed in Offline and Reopened in Online Mode Verification",
-      "baseTestName": "App Killed in Offline and Reopened in Online Mode Verification",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 58373,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Patient Creation -Es",
-      "baseTestName": "Patient Creation",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 99760,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "Generation and Regeneration of Quick Action Templates {ICD & CPT, Care Plan, Feedback, Referral}for the First Encounter -Es",
-      "baseTestName": "Generation and Regeneration of Quick Action Templates {ICD & CPT, Care Plan, Feedback, Referral}for the First Encounter",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 88694,
-      "error": "element (\"~Regenerar códigos ICD y CPT\") still not displayed after 10000ms",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "Quick Action Templet Generation and Regeneration",
-      "baseTestName": "Quick Action Templet Generation and Regeneration",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 405900,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "SOAP Note generation for the Second Conversation",
-      "baseTestName": "SOAP Note generation for the Second Conversation",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 203658,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Automatic Sync Verification (Offline to Online and Vice Versa)",
-      "baseTestName": "Automatic Sync Verification (Offline to Online and Vice Versa)",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 155521,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Finalize encounter",
-      "baseTestName": "Finalize encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 6663,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Transcript verification for the Third Conversation in first Encounter",
-      "baseTestName": "Transcript verification for the Third Conversation in first Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 14867,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Second Conversation for the First Encounter -Es",
-      "baseTestName": "Second Conversation for the First Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 139212,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "Transcript verification for the first Encounter -Es",
-      "baseTestName": "Transcript verification for the first Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 13122,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "App Killed and Reopened (Offline Mode Verification) -Es",
-      "baseTestName": "App Killed and Reopened (Offline Mode Verification)",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 5149,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "Third Conversation {Draft Creation and Completion of Draft Transcript} for the First Encounter -Es",
-      "baseTestName": "Third Conversation {Draft Creation and Completion of Draft Transcript} for the First Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 70866,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "Patient info manual update -Es",
-      "baseTestName": "Patient info manual update",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 153450,
-      "error": "element (\"//XCUIElementTypeTextView[@value=\"Haz clic en el micrófono y comienza a hablar..\"]\") still not displayed after 150000ms",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "Logout -Es",
-      "baseTestName": "Logout",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 12592,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "Patient Info Update -Es",
-      "baseTestName": "Patient Info Update",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 153214,
-      "error": "element (\"~pencil.line\") still not displayed after 150000ms",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "Verify Settings screen Profille Edit ",
-      "baseTestName": "Verify Settings screen Profille Edit",
-      "passed": false,
-      "skipped": true,
-      "failed": false,
-      "duration": 1,
-      "error": null,
-      "isSpanish": false,
-      "status": "skipped"
-    },
-    {
-      "name": "Transcript Verification for the First Conversation",
-      "baseTestName": "Transcript Verification for the First Conversation",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 15013,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Automatic Sync Verification (Offline to Online and Vice Versa) for the First Encounter -Es",
-      "baseTestName": "Automatic Sync Verification (Offline to Online and Vice Versa) for the First Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 240240,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "SOAP Note Generation For New Encounter-Es",
-      "baseTestName": "SOAP Note Generation For New Encounter",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 179436,
-      "error": "Can't call click on element with selector \"//XCUIElementTypeStaticText[@name=\"Naga\" because element wasn't found",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "HayNoki update",
-      "baseTestName": "HayNoki update",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 34277,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "HayNoki verification",
-      "baseTestName": "HayNoki verification",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 37845,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "SOAP Note Generation for the Draft Conversation in the First Encounter",
-      "baseTestName": "SOAP Note Generation for the Draft Conversation in the First Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 25370,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Verify Settings screen Profille Edit #Skipped:-proffile edit is skipped due to Known Issue, related to Api change",
-      "baseTestName": "Verify Settings screen Profille Edit #Skipped:-proffile edit is skipped due to Known Issue, related to Api change",
-      "passed": false,
-      "skipped": true,
-      "failed": false,
-      "duration": 1,
-      "error": null,
-      "isSpanish": false,
-      "status": "skipped"
-    },
-    {
-      "name": "Login with correct credentials & verify Home screen",
-      "baseTestName": "Login with correct credentials & verify Home screen",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 26057,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Transcript Verification for the Draft Conversation",
-      "baseTestName": "Transcript Verification for the Draft Conversation",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 17788,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "App Killed and Reopened (Offline Mode Verification) for the First Encounter",
-      "baseTestName": "App Killed and Reopened (Offline Mode Verification) for the First Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 59586,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Quick Action Templates generation and regeneration",
-      "baseTestName": "Quick Action Templates generation and regeneration",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 144029,
-      "error": "Can't call click on element with selector \"//XCUIElementTypeButton[@name=\"Quick Actions\"]\" because element wasn't found",
-      "isSpanish": false,
-      "status": "broken"
-    },
-    {
-      "name": "SOAP Note Generation and Verification for the Draft Conversationm-Es",
-      "baseTestName": "SOAP Note Generation and Verification for the Draft Conversationm",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 184966,
-      "error": "Can't call click on element with selector \"//XCUIElementTypeStaticText[@name=\"Naga\" because element wasn't found",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "SOAP Note Generation and Verification for the Draft Conversation for the First Encounter -Es",
-      "baseTestName": "SOAP Note Generation and Verification for the Draft Conversation for the First Encounter",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 179201,
-      "error": "Can't call click on element with selector \"//XCUIElementTypeStaticText[@name=\"Danika Shields\" because element wasn't found",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "Third Conversation (Draft Creation and Completion of Draft Transcript)",
-      "baseTestName": "Third Conversation (Draft Creation and Completion of Draft Transcript)",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 148956,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Verify Settings screen launguage and general settings",
-      "baseTestName": "Verify Settings screen launguage and general settings",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 14382,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Transcript Verification for the Second Conversation for the First Encounter -Es",
-      "baseTestName": "Transcript Verification for the Second Conversation for the First Encounter",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 37333,
-      "error": "element (\"//XCUIElementTypeStaticText[@name=\"Mostrar Transcripción Original\"]\") still not displayed after 10000ms",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "Patient Creation",
-      "baseTestName": "Patient Creation",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 99274,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Finalize encounter -Es",
-      "baseTestName": "Finalize encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 14202,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "Automatic Sync Verification (Offline to Online and Vice Versa) for the First Encounter",
-      "baseTestName": "Automatic Sync Verification (Offline to Online and Vice Versa) for the First Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 155790,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Trascript verification -Es",
-      "baseTestName": "Trascript verification",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 10150,
-      "error": "element (\"//XCUIElementTypeStaticText[@name=\"Transcripción\"]\") still not displayed after 10000ms",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "Third Conversation (Draft Creation and Completion of Draft Transcript) for the First Encounter}",
-      "baseTestName": "Third Conversation (Draft Creation and Completion of Draft Transcript) for the First Encounter}",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 90011,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "SOAP Note Verification for the Second Conversation for the First Encounter -Es",
-      "baseTestName": "SOAP Note Verification for the Second Conversation for the First Encounter",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 180623,
-      "error": "Can't call click on element with selector \"//XCUIElementTypeStaticText[@name=\"Danika Shields\" because element wasn't found",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "SOAP Note Generation in First Encounter -Es",
-      "baseTestName": "SOAP Note Generation in First Encounter",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 179606,
-      "error": "Can't call click on element with selector \"//XCUIElementTypeStaticText[@name=\"Danika Shields\" because element wasn't found",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "Verify Reset Password mail generation -Es",
-      "baseTestName": "Verify Reset Password mail generation",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 24056,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "Offline Mode Stop and App Kill Verification",
-      "baseTestName": "Offline Mode Stop and App Kill Verification",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 94198,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Verify Settings screen support_Verification ",
-      "baseTestName": "Verify Settings screen support_Verification",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 7575,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Hay Noki verification -Es",
-      "baseTestName": "Hay Noki verification",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 152813,
-      "error": "element (\"~micIcon\") still not displayed after 150000ms",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "New Encounter Creation -Es",
-      "baseTestName": "New Encounter Creation",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 15127,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "Second Conversation for the New Encounter -Es",
-      "baseTestName": "Second Conversation for the New Encounter",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 10158,
-      "error": "element (\"//XCUIElementTypeStaticText[@name=\"Nota SOAP\"]\") still not displayed after 10000ms",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "Generation and Regeneration of Quick Action Templates (ICD & CPT, Care Plan, Feedback, Referral) -Es",
-      "baseTestName": "Generation and Regeneration of Quick Action Templates (ICD & CPT, Care Plan, Feedback, Referral)",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 152011,
-      "error": "element (\"//XCUIElementTypeButton[@name=\"Acciones rápidas\"]\") still not displayed after 150000ms",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "Transcript verification for the first Encounter",
-      "baseTestName": "Transcript verification for the first Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 14727,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Transcript Verification for the Draft Conversation for the First Encounter -Es",
-      "baseTestName": "Transcript Verification for the Draft Conversation for the First Encounter",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 11215,
-      "error": "element (\"//XCUIElementTypeStaticText[@name=\"Transcripción\"]\") still not displayed after 10000ms",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "Logout",
-      "baseTestName": "Logout",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 10152,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Transcript Verification for the Draft Conversation -Es",
-      "baseTestName": "Transcript Verification for the Draft Conversation",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 10948,
-      "error": "element (\"//XCUIElementTypeStaticText[@name=\"Transcripción\"]\") still not displayed after 10000ms",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "Verify Settings screen general settings",
-      "baseTestName": "Verify Settings screen general settings",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 45022,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "App Killed in Offline and Reopened in Online Mode Verification for the First Encounter",
-      "baseTestName": "App Killed in Offline and Reopened in Online Mode Verification for the First Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 66802,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Verify  general settings ",
-      "baseTestName": "Verify  general settings",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 32390,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Transcript verification for the Second Conversation in first Encounter",
-      "baseTestName": "Transcript verification for the Second Conversation in first Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 15144,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "App Killed in Offline and Reopened in Online Mode Verification -Es",
-      "baseTestName": "App Killed in Offline and Reopened in Online Mode Verification",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 52271,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "SOAP Note Generation in First Encounter",
-      "baseTestName": "SOAP Note Generation in First Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 200070,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Patient info update",
-      "baseTestName": "Patient info update",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 23894,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Offline Mode Stop and App Kill Verification for the First Encounter",
-      "baseTestName": "Offline Mode Stop and App Kill Verification for the First Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 76558,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Patient info manual update",
-      "baseTestName": "Patient info manual update",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 81668,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login with correct credential and verify Home screen animation -Es",
-      "baseTestName": "Login with correct credential and verify Home screen animation",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 20266,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "Verify  launguag change option",
-      "baseTestName": "Verify  launguag change option",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 11720,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "New Encounter Creation",
-      "baseTestName": "New Encounter Creation",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 17078,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Trascript verification for the Second Conversation -Es",
-      "baseTestName": "Trascript verification for the Second Conversation",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 10838,
-      "error": "element (\"//XCUIElementTypeStaticText[@name=\"Transcripción\"]\") still not displayed after 10000ms",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "SOAP Note Generation For New Encounter",
-      "baseTestName": "SOAP Note Generation For New Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 203408,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Offline Mode Stop and App Kill Verification -Es",
-      "baseTestName": "Offline Mode Stop and App Kill Verification",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 87738,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "Second Conversation for the New Encounter",
-      "baseTestName": "Second Conversation for the New Encounter",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 295553,
-      "error": "element (\"~Would you like to use the previous encounter's SOAP note as context?\") still not displayed after 150000ms",
-      "isSpanish": false,
-      "status": "broken"
-    },
-    {
-      "name": "Third Conversation {Draft Creation and Completion of Draft Transcript}",
-      "baseTestName": "Third Conversation {Draft Creation and Completion of Draft Transcript}",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 11514,
-      "error": "element (\"//XCUIElementTypeStaticText[@name=\"Nota SOAP\"]\") still not displayed after 10000ms",
-      "isSpanish": false,
-      "status": "broken"
-    },
-    {
-      "name": "Finalize Encounter -Es",
-      "baseTestName": "Finalize Encounter",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 153270,
-      "error": "element (\"//XCUIElementTypeStaticText[@name=\"Nota SOAP\"]\") still not displayed after 150000ms",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "Verify Settings screen support verification ",
-      "baseTestName": "Verify Settings screen support verification",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 24148,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Transcript Verification for the Second Conversation",
-      "baseTestName": "Transcript Verification for the Second Conversation",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 15101,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Patient Info Update",
-      "baseTestName": "Patient Info Update",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 84565,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "SOAP Note generation for the Second Conversation in First Encounter",
-      "baseTestName": "SOAP Note generation for the Second Conversation in First Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 199658,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "App Killed and Reopened (Offline Mode Verification)",
-      "baseTestName": "App Killed and Reopened (Offline Mode Verification)",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 59412,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Verify Rest Password mail generation",
-      "baseTestName": "Verify Rest Password mail generation",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 21057,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Automatic Sync Verification (Offline to Online and Vice Versa) -Es",
-      "baseTestName": "Automatic Sync Verification (Offline to Online and Vice Versa)",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 225035,
-      "error": null,
-      "isSpanish": true,
-      "status": "passed"
-    },
-    {
-      "name": "SOAP Note Generation for the Draft Conversation",
-      "baseTestName": "SOAP Note Generation for the Draft Conversation",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 214690,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "SOAP Note Verification for the Second Conversation -Es",
-      "baseTestName": "SOAP Note Verification for the Second Conversation",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 179160,
-      "error": "Can't call click on element with selector \"//XCUIElementTypeStaticText[@name=\"Naga\" because element wasn't found",
-      "isSpanish": true,
-      "status": "broken"
-    },
-    {
-      "name": "Second Conversation for the first Encounter",
-      "baseTestName": "Second Conversation for the first Encounter",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 145800,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    }
-  ],
-  "groupedTests": [
-    {
-      "index": 0,
-      "baseTestName": "App Killed and Reopened (Offline Mode Verification) for the First Encounter",
-      "english": {
-        "name": "App Killed and Reopened (Offline Mode Verification) for the First Encounter",
-        "baseTestName": "App Killed and Reopened (Offline Mode Verification) for the First Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 59586,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "App Killed and Reopened (Offline Mode Verification) for the First Encounter -Es",
-        "baseTestName": "App Killed and Reopened (Offline Mode Verification) for the First Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 5098,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 1,
-      "baseTestName": "App Killed in Offline and Reopened in Online Mode Verification for the First Encounter",
-      "english": {
-        "name": "App Killed in Offline and Reopened in Online Mode Verification for the First Encounter",
-        "baseTestName": "App Killed in Offline and Reopened in Online Mode Verification for the First Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 66802,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "App Killed in Offline and Reopened in Online Mode Verification for the First Encounter -Es",
-        "baseTestName": "App Killed in Offline and Reopened in Online Mode Verification for the First Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 65002,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 2,
-      "baseTestName": "Offline Mode Stop and App Kill Verification for the First Encounter",
-      "english": {
-        "name": "Offline Mode Stop and App Kill Verification for the First Encounter",
-        "baseTestName": "Offline Mode Stop and App Kill Verification for the First Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 76558,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "Offline Mode Stop and App Kill Verification for the First Encounter -Es",
-        "baseTestName": "Offline Mode Stop and App Kill Verification for the First Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 73723,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 3,
-      "baseTestName": "App Killed in Offline and Reopened in Online Mode Verification",
-      "english": {
-        "name": "App Killed in Offline and Reopened in Online Mode Verification",
-        "baseTestName": "App Killed in Offline and Reopened in Online Mode Verification",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 58373,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "App Killed in Offline and Reopened in Online Mode Verification -Es",
-        "baseTestName": "App Killed in Offline and Reopened in Online Mode Verification",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 52271,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 4,
-      "baseTestName": "Patient Creation",
-      "english": {
-        "name": "Patient Creation",
-        "baseTestName": "Patient Creation",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 99274,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "Patient Creation -Es",
-        "baseTestName": "Patient Creation",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 99760,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 5,
-      "baseTestName": "Generation and Regeneration of Quick Action Templates {ICD & CPT, Care Plan, Feedback, Referral}for the First Encounter",
-      "english": null,
-      "spanish": {
-        "name": "Generation and Regeneration of Quick Action Templates {ICD & CPT, Care Plan, Feedback, Referral}for the First Encounter -Es",
-        "baseTestName": "Generation and Regeneration of Quick Action Templates {ICD & CPT, Care Plan, Feedback, Referral}for the First Encounter",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 88694,
-        "error": "element (\"~Regenerar códigos ICD y CPT\") still not displayed after 10000ms",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 6,
-      "baseTestName": "Quick Action Templet Generation and Regeneration",
-      "english": {
-        "name": "Quick Action Templet Generation and Regeneration",
-        "baseTestName": "Quick Action Templet Generation and Regeneration",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 405900,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 7,
-      "baseTestName": "SOAP Note generation for the Second Conversation",
-      "english": {
-        "name": "SOAP Note generation for the Second Conversation",
-        "baseTestName": "SOAP Note generation for the Second Conversation",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 203658,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 8,
-      "baseTestName": "Automatic Sync Verification (Offline to Online and Vice Versa)",
-      "english": {
-        "name": "Automatic Sync Verification (Offline to Online and Vice Versa)",
-        "baseTestName": "Automatic Sync Verification (Offline to Online and Vice Versa)",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 155521,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "Automatic Sync Verification (Offline to Online and Vice Versa) -Es",
-        "baseTestName": "Automatic Sync Verification (Offline to Online and Vice Versa)",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 225035,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 9,
-      "baseTestName": "Finalize encounter",
-      "english": {
-        "name": "Finalize encounter",
-        "baseTestName": "Finalize encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 6663,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "Finalize encounter -Es",
-        "baseTestName": "Finalize encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 14202,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 10,
-      "baseTestName": "Transcript verification for the Third Conversation in first Encounter",
-      "english": {
-        "name": "Transcript verification for the Third Conversation in first Encounter",
-        "baseTestName": "Transcript verification for the Third Conversation in first Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 14867,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 11,
-      "baseTestName": "Second Conversation for the First Encounter",
-      "english": null,
-      "spanish": {
-        "name": "Second Conversation for the First Encounter -Es",
-        "baseTestName": "Second Conversation for the First Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 139212,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 12,
-      "baseTestName": "Transcript verification for the first Encounter",
-      "english": {
-        "name": "Transcript verification for the first Encounter",
-        "baseTestName": "Transcript verification for the first Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 14727,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "Transcript verification for the first Encounter -Es",
-        "baseTestName": "Transcript verification for the first Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 13122,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 13,
-      "baseTestName": "App Killed and Reopened (Offline Mode Verification)",
-      "english": {
-        "name": "App Killed and Reopened (Offline Mode Verification)",
-        "baseTestName": "App Killed and Reopened (Offline Mode Verification)",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 59412,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "App Killed and Reopened (Offline Mode Verification) -Es",
-        "baseTestName": "App Killed and Reopened (Offline Mode Verification)",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 5149,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 14,
-      "baseTestName": "Third Conversation {Draft Creation and Completion of Draft Transcript} for the First Encounter",
-      "english": null,
-      "spanish": {
-        "name": "Third Conversation {Draft Creation and Completion of Draft Transcript} for the First Encounter -Es",
-        "baseTestName": "Third Conversation {Draft Creation and Completion of Draft Transcript} for the First Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 70866,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 15,
-      "baseTestName": "Patient info manual update",
-      "english": {
-        "name": "Patient info manual update",
-        "baseTestName": "Patient info manual update",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 81668,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "Patient info manual update -Es",
-        "baseTestName": "Patient info manual update",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 153450,
-        "error": "element (\"//XCUIElementTypeTextView[@value=\"Haz clic en el micrófono y comienza a hablar..\"]\") still not displayed after 150000ms",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 16,
-      "baseTestName": "Logout",
-      "english": {
-        "name": "Logout",
-        "baseTestName": "Logout",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 10152,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "Logout -Es",
-        "baseTestName": "Logout",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 12592,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 17,
-      "baseTestName": "Patient Info Update",
-      "english": {
-        "name": "Patient Info Update",
-        "baseTestName": "Patient Info Update",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 84565,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "Patient Info Update -Es",
-        "baseTestName": "Patient Info Update",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 153214,
-        "error": "element (\"~pencil.line\") still not displayed after 150000ms",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 18,
-      "baseTestName": "Verify Settings screen Profille Edit",
-      "english": {
-        "name": "Verify Settings screen Profille Edit ",
-        "baseTestName": "Verify Settings screen Profille Edit",
-        "passed": false,
-        "skipped": true,
-        "failed": false,
-        "duration": 1,
-        "error": null,
-        "isSpanish": false,
-        "status": "skipped"
-      },
-      "spanish": null
-    },
-    {
-      "index": 19,
-      "baseTestName": "Transcript Verification for the First Conversation",
-      "english": {
-        "name": "Transcript Verification for the First Conversation",
-        "baseTestName": "Transcript Verification for the First Conversation",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 15013,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 20,
-      "baseTestName": "Automatic Sync Verification (Offline to Online and Vice Versa) for the First Encounter",
-      "english": {
-        "name": "Automatic Sync Verification (Offline to Online and Vice Versa) for the First Encounter",
-        "baseTestName": "Automatic Sync Verification (Offline to Online and Vice Versa) for the First Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 155790,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "Automatic Sync Verification (Offline to Online and Vice Versa) for the First Encounter -Es",
-        "baseTestName": "Automatic Sync Verification (Offline to Online and Vice Versa) for the First Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 240240,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 21,
-      "baseTestName": "SOAP Note Generation For New Encounter",
-      "english": {
-        "name": "SOAP Note Generation For New Encounter",
-        "baseTestName": "SOAP Note Generation For New Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 203408,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "SOAP Note Generation For New Encounter-Es",
-        "baseTestName": "SOAP Note Generation For New Encounter",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 179436,
-        "error": "Can't call click on element with selector \"//XCUIElementTypeStaticText[@name=\"Naga\" because element wasn't found",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 22,
-      "baseTestName": "HayNoki update",
-      "english": {
-        "name": "HayNoki update",
-        "baseTestName": "HayNoki update",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 34277,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 23,
-      "baseTestName": "HayNoki verification",
-      "english": {
-        "name": "HayNoki verification",
-        "baseTestName": "HayNoki verification",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 37845,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 24,
-      "baseTestName": "SOAP Note Generation for the Draft Conversation in the First Encounter",
-      "english": {
-        "name": "SOAP Note Generation for the Draft Conversation in the First Encounter",
-        "baseTestName": "SOAP Note Generation for the Draft Conversation in the First Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 25370,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 25,
-      "baseTestName": "Verify Settings screen Profille Edit #Skipped:-proffile edit is skipped due to Known Issue, related to Api change",
-      "english": {
-        "name": "Verify Settings screen Profille Edit #Skipped:-proffile edit is skipped due to Known Issue, related to Api change",
-        "baseTestName": "Verify Settings screen Profille Edit #Skipped:-proffile edit is skipped due to Known Issue, related to Api change",
-        "passed": false,
-        "skipped": true,
-        "failed": false,
-        "duration": 1,
-        "error": null,
-        "isSpanish": false,
-        "status": "skipped"
-      },
-      "spanish": null
-    },
-    {
-      "index": 26,
-      "baseTestName": "Login with correct credentials & verify Home screen",
-      "english": {
-        "name": "Login with correct credentials & verify Home screen",
-        "baseTestName": "Login with correct credentials & verify Home screen",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 26057,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 27,
-      "baseTestName": "Transcript Verification for the Draft Conversation",
-      "english": {
-        "name": "Transcript Verification for the Draft Conversation",
-        "baseTestName": "Transcript Verification for the Draft Conversation",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 17788,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "Transcript Verification for the Draft Conversation -Es",
-        "baseTestName": "Transcript Verification for the Draft Conversation",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 10948,
-        "error": "element (\"//XCUIElementTypeStaticText[@name=\"Transcripción\"]\") still not displayed after 10000ms",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 28,
-      "baseTestName": "Quick Action Templates generation and regeneration",
-      "english": {
-        "name": "Quick Action Templates generation and regeneration",
-        "baseTestName": "Quick Action Templates generation and regeneration",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 144029,
-        "error": "Can't call click on element with selector \"//XCUIElementTypeButton[@name=\"Quick Actions\"]\" because element wasn't found",
-        "isSpanish": false,
-        "status": "broken"
-      },
-      "spanish": null
-    },
-    {
-      "index": 29,
-      "baseTestName": "SOAP Note Generation and Verification for the Draft Conversationm",
-      "english": null,
-      "spanish": {
-        "name": "SOAP Note Generation and Verification for the Draft Conversationm-Es",
-        "baseTestName": "SOAP Note Generation and Verification for the Draft Conversationm",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 184966,
-        "error": "Can't call click on element with selector \"//XCUIElementTypeStaticText[@name=\"Naga\" because element wasn't found",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 30,
-      "baseTestName": "SOAP Note Generation and Verification for the Draft Conversation for the First Encounter",
-      "english": null,
-      "spanish": {
-        "name": "SOAP Note Generation and Verification for the Draft Conversation for the First Encounter -Es",
-        "baseTestName": "SOAP Note Generation and Verification for the Draft Conversation for the First Encounter",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 179201,
-        "error": "Can't call click on element with selector \"//XCUIElementTypeStaticText[@name=\"Danika Shields\" because element wasn't found",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 31,
-      "baseTestName": "Third Conversation (Draft Creation and Completion of Draft Transcript)",
-      "english": {
-        "name": "Third Conversation (Draft Creation and Completion of Draft Transcript)",
-        "baseTestName": "Third Conversation (Draft Creation and Completion of Draft Transcript)",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 148956,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 32,
-      "baseTestName": "Verify Settings screen launguage and general settings",
-      "english": {
-        "name": "Verify Settings screen launguage and general settings",
-        "baseTestName": "Verify Settings screen launguage and general settings",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 14382,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 33,
-      "baseTestName": "Transcript Verification for the Second Conversation for the First Encounter",
-      "english": null,
-      "spanish": {
-        "name": "Transcript Verification for the Second Conversation for the First Encounter -Es",
-        "baseTestName": "Transcript Verification for the Second Conversation for the First Encounter",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 37333,
-        "error": "element (\"//XCUIElementTypeStaticText[@name=\"Mostrar Transcripción Original\"]\") still not displayed after 10000ms",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 34,
-      "baseTestName": "Trascript verification",
-      "english": null,
-      "spanish": {
-        "name": "Trascript verification -Es",
-        "baseTestName": "Trascript verification",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 10150,
-        "error": "element (\"//XCUIElementTypeStaticText[@name=\"Transcripción\"]\") still not displayed after 10000ms",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 35,
-      "baseTestName": "Third Conversation (Draft Creation and Completion of Draft Transcript) for the First Encounter}",
-      "english": {
-        "name": "Third Conversation (Draft Creation and Completion of Draft Transcript) for the First Encounter}",
-        "baseTestName": "Third Conversation (Draft Creation and Completion of Draft Transcript) for the First Encounter}",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 90011,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 36,
-      "baseTestName": "SOAP Note Verification for the Second Conversation for the First Encounter",
-      "english": null,
-      "spanish": {
-        "name": "SOAP Note Verification for the Second Conversation for the First Encounter -Es",
-        "baseTestName": "SOAP Note Verification for the Second Conversation for the First Encounter",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 180623,
-        "error": "Can't call click on element with selector \"//XCUIElementTypeStaticText[@name=\"Danika Shields\" because element wasn't found",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 37,
-      "baseTestName": "SOAP Note Generation in First Encounter",
-      "english": {
-        "name": "SOAP Note Generation in First Encounter",
-        "baseTestName": "SOAP Note Generation in First Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 200070,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "SOAP Note Generation in First Encounter -Es",
-        "baseTestName": "SOAP Note Generation in First Encounter",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 179606,
-        "error": "Can't call click on element with selector \"//XCUIElementTypeStaticText[@name=\"Danika Shields\" because element wasn't found",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 38,
-      "baseTestName": "Verify Reset Password mail generation",
-      "english": null,
-      "spanish": {
-        "name": "Verify Reset Password mail generation -Es",
-        "baseTestName": "Verify Reset Password mail generation",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 24056,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 39,
-      "baseTestName": "Offline Mode Stop and App Kill Verification",
-      "english": {
-        "name": "Offline Mode Stop and App Kill Verification",
-        "baseTestName": "Offline Mode Stop and App Kill Verification",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 94198,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "Offline Mode Stop and App Kill Verification -Es",
-        "baseTestName": "Offline Mode Stop and App Kill Verification",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 87738,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 40,
-      "baseTestName": "Verify Settings screen support_Verification",
-      "english": {
-        "name": "Verify Settings screen support_Verification ",
-        "baseTestName": "Verify Settings screen support_Verification",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 7575,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 41,
-      "baseTestName": "Hay Noki verification",
-      "english": null,
-      "spanish": {
-        "name": "Hay Noki verification -Es",
-        "baseTestName": "Hay Noki verification",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 152813,
-        "error": "element (\"~micIcon\") still not displayed after 150000ms",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 42,
-      "baseTestName": "New Encounter Creation",
-      "english": {
-        "name": "New Encounter Creation",
-        "baseTestName": "New Encounter Creation",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 17078,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": {
-        "name": "New Encounter Creation -Es",
-        "baseTestName": "New Encounter Creation",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 15127,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 43,
-      "baseTestName": "Second Conversation for the New Encounter",
-      "english": {
-        "name": "Second Conversation for the New Encounter",
-        "baseTestName": "Second Conversation for the New Encounter",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 295553,
-        "error": "element (\"~Would you like to use the previous encounter's SOAP note as context?\") still not displayed after 150000ms",
-        "isSpanish": false,
-        "status": "broken"
-      },
-      "spanish": {
-        "name": "Second Conversation for the New Encounter -Es",
-        "baseTestName": "Second Conversation for the New Encounter",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 10158,
-        "error": "element (\"//XCUIElementTypeStaticText[@name=\"Nota SOAP\"]\") still not displayed after 10000ms",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 44,
-      "baseTestName": "Generation and Regeneration of Quick Action Templates (ICD & CPT, Care Plan, Feedback, Referral)",
-      "english": null,
-      "spanish": {
-        "name": "Generation and Regeneration of Quick Action Templates (ICD & CPT, Care Plan, Feedback, Referral) -Es",
-        "baseTestName": "Generation and Regeneration of Quick Action Templates (ICD & CPT, Care Plan, Feedback, Referral)",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 152011,
-        "error": "element (\"//XCUIElementTypeButton[@name=\"Acciones rápidas\"]\") still not displayed after 150000ms",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 45,
-      "baseTestName": "Transcript Verification for the Draft Conversation for the First Encounter",
-      "english": null,
-      "spanish": {
-        "name": "Transcript Verification for the Draft Conversation for the First Encounter -Es",
-        "baseTestName": "Transcript Verification for the Draft Conversation for the First Encounter",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 11215,
-        "error": "element (\"//XCUIElementTypeStaticText[@name=\"Transcripción\"]\") still not displayed after 10000ms",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 46,
-      "baseTestName": "Verify Settings screen general settings",
-      "english": {
-        "name": "Verify Settings screen general settings",
-        "baseTestName": "Verify Settings screen general settings",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 45022,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 47,
-      "baseTestName": "Verify  general settings",
-      "english": {
-        "name": "Verify  general settings ",
-        "baseTestName": "Verify  general settings",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 32390,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 48,
-      "baseTestName": "Transcript verification for the Second Conversation in first Encounter",
-      "english": {
-        "name": "Transcript verification for the Second Conversation in first Encounter",
-        "baseTestName": "Transcript verification for the Second Conversation in first Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 15144,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 49,
-      "baseTestName": "Patient info update",
-      "english": {
-        "name": "Patient info update",
-        "baseTestName": "Patient info update",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 23894,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 50,
-      "baseTestName": "Login with correct credential and verify Home screen animation",
-      "english": null,
-      "spanish": {
-        "name": "Login with correct credential and verify Home screen animation -Es",
-        "baseTestName": "Login with correct credential and verify Home screen animation",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 20266,
-        "error": null,
-        "isSpanish": true,
-        "status": "passed"
-      }
-    },
-    {
-      "index": 51,
-      "baseTestName": "Verify  launguag change option",
-      "english": {
-        "name": "Verify  launguag change option",
-        "baseTestName": "Verify  launguag change option",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 11720,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 52,
-      "baseTestName": "Trascript verification for the Second Conversation",
-      "english": null,
-      "spanish": {
-        "name": "Trascript verification for the Second Conversation -Es",
-        "baseTestName": "Trascript verification for the Second Conversation",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 10838,
-        "error": "element (\"//XCUIElementTypeStaticText[@name=\"Transcripción\"]\") still not displayed after 10000ms",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 53,
-      "baseTestName": "Third Conversation {Draft Creation and Completion of Draft Transcript}",
-      "english": {
-        "name": "Third Conversation {Draft Creation and Completion of Draft Transcript}",
-        "baseTestName": "Third Conversation {Draft Creation and Completion of Draft Transcript}",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 11514,
-        "error": "element (\"//XCUIElementTypeStaticText[@name=\"Nota SOAP\"]\") still not displayed after 10000ms",
-        "isSpanish": false,
-        "status": "broken"
-      },
-      "spanish": null
-    },
-    {
-      "index": 54,
-      "baseTestName": "Finalize Encounter",
-      "english": null,
-      "spanish": {
-        "name": "Finalize Encounter -Es",
-        "baseTestName": "Finalize Encounter",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 153270,
-        "error": "element (\"//XCUIElementTypeStaticText[@name=\"Nota SOAP\"]\") still not displayed after 150000ms",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 55,
-      "baseTestName": "Verify Settings screen support verification",
-      "english": {
-        "name": "Verify Settings screen support verification ",
-        "baseTestName": "Verify Settings screen support verification",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 24148,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 56,
-      "baseTestName": "Transcript Verification for the Second Conversation",
-      "english": {
-        "name": "Transcript Verification for the Second Conversation",
-        "baseTestName": "Transcript Verification for the Second Conversation",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 15101,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 57,
-      "baseTestName": "SOAP Note generation for the Second Conversation in First Encounter",
-      "english": {
-        "name": "SOAP Note generation for the Second Conversation in First Encounter",
-        "baseTestName": "SOAP Note generation for the Second Conversation in First Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 199658,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 58,
-      "baseTestName": "Verify Rest Password mail generation",
-      "english": {
-        "name": "Verify Rest Password mail generation",
-        "baseTestName": "Verify Rest Password mail generation",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 21057,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 59,
-      "baseTestName": "SOAP Note Generation for the Draft Conversation",
-      "english": {
-        "name": "SOAP Note Generation for the Draft Conversation",
-        "baseTestName": "SOAP Note Generation for the Draft Conversation",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 214690,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 60,
-      "baseTestName": "SOAP Note Verification for the Second Conversation",
-      "english": null,
-      "spanish": {
-        "name": "SOAP Note Verification for the Second Conversation -Es",
-        "baseTestName": "SOAP Note Verification for the Second Conversation",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 179160,
-        "error": "Can't call click on element with selector \"//XCUIElementTypeStaticText[@name=\"Naga\" because element wasn't found",
-        "isSpanish": true,
-        "status": "broken"
-      }
-    },
-    {
-      "index": 61,
-      "baseTestName": "Second Conversation for the first Encounter",
-      "english": {
-        "name": "Second Conversation for the first Encounter",
-        "baseTestName": "Second Conversation for the first Encounter",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 145800,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    }
-  ],
-  "stats": {
-    "total": 81,
-    "passed": 58,
-    "failed": 21,
-    "skipped": 2
-  },
-  "meta": {
-    "platform": "iOS",
-    "reportDate": "2/17/2026, 5:33:49 PM",
-    "reportTimestamp": "2026-02-17T12:03:49.273Z"
-  }
-};
-        
-        // Populate stats
-        document.getElementById('platform').textContent = REPORT_DATA.meta.platform.toUpperCase();
-        document.getElementById('reportDate').textContent = REPORT_DATA.meta.reportDate;
-        document.getElementById('statTotal').textContent = REPORT_DATA.stats.total;
-        document.getElementById('statPassed').textContent = REPORT_DATA.stats.passed;
-        document.getElementById('statFailed').textContent = REPORT_DATA.stats.failed;
-        document.getElementById('statSkipped').textContent = REPORT_DATA.stats.skipped;
-        document.getElementById('detailPlatform').textContent = REPORT_DATA.meta.platform.toUpperCase();
-        document.getElementById('detailGenerated').textContent = REPORT_DATA.meta.reportDate;
-        
-        // Generate table rows
-        const tbody = document.getElementById('testTableBody');
-        REPORT_DATA.groupedTests.forEach(group => {
-            const englishStatus = group.english
-                ? group.english.skipped ? "skipped" : group.english.passed ? "passed" : "failed"
-                : "not-run";
-            
-            const spanishStatus = group.spanish
-                ? group.spanish.skipped ? "skipped" : group.spanish.passed ? "passed" : "failed"
-                : "not-run";
-            
-            const englishText = group.english
-                ? group.english.skipped ? "⊗ SKIPPED" : group.english.passed ? "✓ PASS" : "✗ FAIL"
-                : "- NOT RUN";
-            
-            const spanishText = group.spanish
-                ? group.spanish.skipped ? "⊗ SKIPPED" : group.spanish.passed ? "✓ PASS" : "✗ FAIL"
-                : "- NOT RUN";
-            
-            const row = tbody.insertRow();
-            row.innerHTML = `
-                <td class="test-name">${group.baseTestName}</td>
-                <td class="status ${englishStatus}">${englishText}</td>
-                <td class="status ${spanishStatus}">${spanishText}</td>
-                <td class="comment-cell">
-                    <input type="text" 
-                           class="comment-input" 
-                           data-test-index="${group.index}"
-                           placeholder="Add comment..." 
-                           onchange="saveData()" />
-                </td>
-            `;
-        });
-        
-        // Load saved comments
-        function loadData() {
-            const inputs = document.querySelectorAll('.comment-input');
-            inputs.forEach((input) => {
-                const testIndex = input.getAttribute('data-test-index');
-                const saved = localStorage.getItem('test_comment_' + testIndex);
-                if (saved) { input.value = saved; }
-            });
-        }
-        
-        function saveData() {
-            const inputs = document.querySelectorAll('.comment-input');
-            inputs.forEach((input) => {
-                const testIndex = input.getAttribute('data-test-index');
-                localStorage.setItem('test_comment_' + testIndex, input.value);
-            });
-            const indicator = document.getElementById('saveIndicator');
-            indicator.classList.add('show');
-            setTimeout(() => { indicator.classList.remove('show'); }, 2000);
-        }
-        
-        function exportToCSV() {
-            let csv = 'Test Case,English,Spanish,Comments\n';
-            REPORT_DATA.groupedTests.forEach(group => {
-               const englishBase = group.english
-    ? group.english.skipped ? "⊗ SKIPPED"
-    : group.english.passed ? "✓ PASS"
-    : "✗ FAIL"
-    : "- NOT RUN";
+<div class="page">
+<div class="hdr">
+  <div><h1>&#128241; iOS Test Report <span>v2</span></h1>
+  <div class="hdr-meta" id="hdrMeta">Loading&hellip;</div></div>
+  <a href="index.html" class="back">&larr; Dashboard</a>
+</div>
+<div class="stats">
+  <div class="sc"><div class="sc-lbl">Total</div><div class="sc-val" id="sTotal">0</div></div>
+  <div class="sc p"><div class="sc-lbl">&#10003; Passed</div><div class="sc-val" id="sPassed">0</div></div>
+  <div class="sc f"><div class="sc-lbl">&#10007; Failed</div><div class="sc-val" id="sFailed">0</div></div>
+  <div class="sc s"><div class="sc-lbl">&#8855; Skipped</div><div class="sc-val" id="sSkipped">0</div></div>
+</div>
+<div class="legend">
+  <span class="leg-ttl">Legend</span>
+  <div class="leg-item"><span class="lb p">&#10003; PASS</span> Test passed</div>
+  <div class="leg-item"><span class="lb f">&#10007; FAIL</span> Test failed</div>
+  <div class="leg-item"><span class="lb s">&#8855; SKIP</span> Skipped</div>
+  <div class="leg-item"><span class="lb nr">&mdash; N/R</span> Not run</div>
+  <div class="leg-item"><span class="lb iss">!</span> Known issue &mdash; click to see full issue text</div>
+</div>
+<div class="toolbar">
+  <div class="fg">
+    <span class="flbl">Filter:</span>
+    <button class="fbtn on" data-f="all"     onclick="setF('all')">All</button>
+    <button class="fbtn"    data-f="passed"  onclick="setF('passed')">&#10003; Pass</button>
+    <button class="fbtn"    data-f="failed"  onclick="setF('failed')">&#10007; Fail</button>
+    <button class="fbtn"    data-f="skipped" onclick="setF('skipped')">&#8855; Skip</button>
+    <button class="fbtn"    data-f="notrun"  onclick="setF('notrun')">&mdash; Not Run</button>
+    <button class="fbtn"    data-f="issue"   onclick="setF('issue')">! Issues</button>
+  </div>
+  <div class="eg">
+    <button class="cbtn" onclick="expandAll()">Expand All</button>
+    <button class="cbtn" onclick="collapseAll()">Collapse All</button>
+    <span class="sind" id="sind">&#10003; Saved</span>
+  </div>
+</div>
+<div class="suites" id="suites"></div>
+<div class="nores" id="nores">No tests match the current filter.</div>
+<div class="exp-row">
+  <button class="exp-btn" onclick="exportCSV()">&#128229; Export CSV</button>
+</div>
+<div class="footer">WebdriverIO + Appium + Allure &mdash; iOS Automated Test Report</div>
+</div>
+<script>
 
-const spanishBase = group.spanish
-    ? group.spanish.skipped ? "⊗ SKIPPED"
-    : group.spanish.passed ? "✓ PASS"
-    : "✗ FAIL"
-    : "- NOT RUN";
+var D = {"suites":[{"name":"Existing Patient","pairs":[{"base":"New Encounter Creation","en":{"name":"New Encounter Creation","baseTestName":"New Encounter Creation","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":16841,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"New Encounter Creation -Es","baseTestName":"New Encounter Creation","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":23063,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Patient Info Update","en":{"name":"Patient Info Update","baseTestName":"Patient Info Update","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":26398,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Patient Info Update -Es","baseTestName":"Patient Info Update","suite":"Existing Patient","passed":false,"skipped":false,"failed":true,"dur":17507,"err":"element (\"~+  Add Información del paciente\") still not displayed after 10000ms","isSpanish":true,"status":"broken","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"App Killed and Reopened (Offline Mode Verification)","en":{"name":"App Killed and Reopened (Offline Mode Verification)","baseTestName":"App Killed and Reopened (Offline Mode Verification)","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":58984,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"App Killed and Reopened (Offline Mode Verification) -Es","baseTestName":"App Killed and Reopened (Offline Mode Verification)","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":45884,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Patient info manual update","en":{"name":"Patient info manual update","baseTestName":"Patient info manual update","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":129861,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Patient info manual update -Es","baseTestName":"Patient info manual update","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":23186,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Transcript Verification for the First Conversation","en":{"name":"Transcript Verification for the First Conversation","baseTestName":"Transcript Verification for the First Conversation","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":13964,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Second Conversation for the New Encounter","en":{"name":"Second Conversation for the New Encounter","baseTestName":"Second Conversation for the New Encounter","suite":"Existing Patient","passed":false,"skipped":false,"failed":true,"dur":305035,"err":"element (\"~Would you like to use the previous encounter's SOAP note as context?\") still not displayed after 150000ms","isSpanish":false,"status":"broken","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Second Conversation for the New Encounter -Es","baseTestName":"Second Conversation for the New Encounter","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":113609,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"SOAP Note Verification for the Second Conversation","en":null,"es":{"name":"SOAP Note Verification for the Second Conversation -Es","baseTestName":"SOAP Note Verification for the Second Conversation","suite":"Existing Patient","passed":false,"skipped":false,"failed":true,"dur":168478,"err":"searchPatientPage is not defined","isSpanish":true,"status":"broken","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"HayNoki verification","en":{"name":"HayNoki verification","baseTestName":"HayNoki verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":173322,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Finalize Encounter","en":null,"es":{"name":"Finalize Encounter -Es","baseTestName":"Finalize Encounter","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":14261,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"App Killed in Offline and Reopened in Online Mode Verification","en":{"name":"App Killed in Offline and Reopened in Online Mode Verification","baseTestName":"App Killed in Offline and Reopened in Online Mode Verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":57922,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"App Killed in Offline and Reopened in Online Mode Verification -Es","baseTestName":"App Killed in Offline and Reopened in Online Mode Verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":42099,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Trascript verification for the Second Conversation","en":null,"es":{"name":"Trascript verification for the Second Conversation -Es","baseTestName":"Trascript verification for the Second Conversation","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":17565,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Automatic Sync Verification (Offline to Online and Vice Versa)","en":{"name":"Automatic Sync Verification (Offline to Online and Vice Versa)","baseTestName":"Automatic Sync Verification (Offline to Online and Vice Versa)","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":157249,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Automatic Sync Verification (Offline to Online and Vice Versa) -Es","baseTestName":"Automatic Sync Verification (Offline to Online and Vice Versa)","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":170377,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Referal Generation and Regeneration","en":{"name":"Referal Generation and Regeneration","baseTestName":"Referal Generation and Regeneration","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":63033,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Referal Generation and Regeneration-Es","baseTestName":"Referal Generation and Regeneration","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":45297,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"ICD-DPT Codes Generation and Regeneration","en":null,"es":{"name":"ICD-DPT Codes Generation and Regeneration-Es","baseTestName":"ICD-DPT Codes Generation and Regeneration","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":120682,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Logout","en":{"name":"Logout","baseTestName":"Logout","suite":"Existing Patient","passed":false,"skipped":false,"failed":true,"dur":34979,"err":"element (\"~logout\") still not displayed after 10000ms","isSpanish":false,"status":"broken","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Logout -Es","baseTestName":"Logout","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":9681,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Third Conversation {Draft Creation and Completion of Draft Transcript}","en":{"name":"Third Conversation {Draft Creation and Completion of Draft Transcript}","baseTestName":"Third Conversation {Draft Creation and Completion of Draft Transcript}","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":72583,"err":null,"isSpanish":false,"status":"passed","hasIssue":true,"issueUrl":"the previous encounter is saved as a dreaft ","issueName":"the previous encounter is saved as a dreaft "},"es":null},{"base":"Care plan Generation and Regeneration","en":{"name":"Care plan Generation and Regeneration","baseTestName":"Care plan Generation and Regeneration","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":75109,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Care plan Generation and Regeneration-Es","baseTestName":"Care plan Generation and Regeneration","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":109403,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"SOAP Note generation for the Second Conversation","en":{"name":"SOAP Note generation for the Second Conversation","baseTestName":"SOAP Note generation for the Second Conversation","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":209379,"err":null,"isSpanish":false,"status":"passed","hasIssue":true,"issueUrl":"The soap note is  genrated instead of showing 'Add Conversation' Button it is showing 'resumeConvesation' is saved as Draft","issueName":"The soap note is  genrated instead of showing 'Add Conversation' Button it is showing 'resumeConvesation' is saved as Draft"},"es":null},{"base":"Third Conversation (Draft Creation and Completion of Draft Transcript)","en":{"name":"Third Conversation (Draft Creation and Completion of Draft Transcript)","baseTestName":"Third Conversation (Draft Creation and Completion of Draft Transcript)","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":161379,"err":null,"isSpanish":false,"status":"passed","hasIssue":true,"issueUrl":"The second conversation is saved as a draft","issueName":"The second conversation is saved as a draft"},"es":null},{"base":"SOAP Note Generation For New Encounter","en":{"name":"SOAP Note Generation For New Encounter","baseTestName":"SOAP Note Generation For New Encounter","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":201870,"err":null,"isSpanish":false,"status":"passed","hasIssue":true,"issueUrl":"Soap note is not generated Even after long time ","issueName":"Soap note is not generated Even after long time "},"es":{"name":"SOAP Note Generation For New Encounter-Es","baseTestName":"SOAP Note Generation For New Encounter","suite":"Existing Patient","passed":false,"skipped":false,"failed":true,"dur":169294,"err":"searchPatientPage is not defined","isSpanish":true,"status":"broken","hasIssue":true,"issueUrl":"Quick Action Button is not displayed even after long wait waiting","issueName":"Quick Action Button is not displayed even after long wait waiting"}},{"base":"SOAP Note Generation for the Draft Conversationm","en":null,"es":{"name":"SOAP Note Generation for the Draft Conversationm-Es","baseTestName":"SOAP Note Generation for the Draft Conversationm","suite":"Existing Patient","passed":false,"skipped":false,"failed":true,"dur":168787,"err":"searchPatientPage is not defined","isSpanish":true,"status":"broken","hasIssue":true,"issueUrl":"Quick Action Button is not displayed even after long wait waiting","issueName":"Quick Action Button is not displayed even after long wait waiting"}},{"base":"Feedback Generation and Regeneration","en":{"name":"Feedback Generation and Regeneration","baseTestName":"Feedback Generation and Regeneration","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":69363,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Feedback Generation and Regeneration-Es","baseTestName":"Feedback Generation and Regeneration","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":81440,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"SoapNote Regeneration","en":{"name":"SoapNote Regeneration","baseTestName":"SoapNote Regeneration","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":67880,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"SoapNote Regeneration-Es","baseTestName":"SoapNote Regeneration","suite":"Existing Patient","passed":false,"skipped":false,"failed":true,"dur":11810,"err":"element (\"~Regenerar nota SOAP\") still not displayed after 10000ms","isSpanish":true,"status":"broken","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"SOAP Note Generation for the Draft Conversation","en":{"name":"SOAP Note Generation for the Draft Conversation","baseTestName":"SOAP Note Generation for the Draft Conversation","suite":"Existing Patient","passed":false,"skipped":false,"failed":true,"dur":173454,"err":"Can't call click on element with selector \"~Search Patients\" because element wasn't found","isSpanish":false,"status":"broken","hasIssue":true,"issueUrl":"Quick Action Button is not displayed even after long wait waiting","issueName":"Quick Action Button is not displayed even after long wait waiting"},"es":null},{"base":"Offline Mode Stop and App Kill Verification","en":{"name":"Offline Mode Stop and App Kill Verification","baseTestName":"Offline Mode Stop and App Kill Verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":87601,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Offline Mode Stop and App Kill Verification -Es","baseTestName":"Offline Mode Stop and App Kill Verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":81919,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"ICD-CPT codes Generation and Regeneration","en":{"name":"ICD-CPT codes Generation and Regeneration","baseTestName":"ICD-CPT codes Generation and Regeneration","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":126726,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Finalize encounter","en":{"name":"Finalize encounter","baseTestName":"Finalize encounter","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":6603,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Transcript Verification for the Draft Conversation","en":{"name":"Transcript Verification for the Draft Conversation","baseTestName":"Transcript Verification for the Draft Conversation","suite":"Existing Patient","passed":false,"skipped":false,"failed":true,"dur":10075,"err":"element (\"~Transcript\") still not displayed after 10000ms","isSpanish":false,"status":"broken","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Transcript Verification for the Draft Conversation -Es","baseTestName":"Transcript Verification for the Draft Conversation","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":18384,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Trascript verification","en":null,"es":{"name":"Trascript verification -Es","baseTestName":"Trascript verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":18319,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Transcript Verification for the Second Conversation","en":{"name":"Transcript Verification for the Second Conversation","baseTestName":"Transcript Verification for the Second Conversation","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":14788,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Hay Noki verification","en":null,"es":{"name":"Hay Noki verification -Es","baseTestName":"Hay Noki verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":76148,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}}],"stats":{"total":31,"passed":25,"failed":6,"skipped":0}},{"name":"New Patient","pairs":[{"base":"Transcript verification for the Third Conversation in First Encounter","en":{"name":"Transcript verification for the Third Conversation in First Encounter","baseTestName":"Transcript verification for the Third Conversation in First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":11975,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Transcript verification for the Third Conversation in First Encounter -Es","baseTestName":"Transcript verification for the Third Conversation in First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":74985,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Patient info manual update","en":{"name":"Patient info manual update","baseTestName":"Patient info manual update","suite":"New Patient","passed":false,"skipped":false,"failed":true,"dur":174647,"err":"element (\"~O negative\") still not displayed after 150000ms","isSpanish":false,"status":"broken","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Automatic Sync Verification (Offline to Online and Vice Versa) for the First Encounter","en":{"name":"Automatic Sync Verification (Offline to Online and Vice Versa) for the First Encounter","baseTestName":"Automatic Sync Verification (Offline to Online and Vice Versa) for the First Encounter","suite":"New Patient","passed":false,"skipped":false,"failed":true,"dur":72593,"err":"element (\"~No transcript available in offline mode\") still not displayed after 10000ms","isSpanish":false,"status":"broken","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Automatic Sync Verification (Offline to Online and Vice Versa) for the First Encounter -Es","baseTestName":"Automatic Sync Verification (Offline to Online and Vice Versa) for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":166816,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"App Killed and Reopened (Offline Mode Verification) for the First Encounter","en":{"name":"App Killed and Reopened (Offline Mode Verification) for the First Encounter","baseTestName":"App Killed and Reopened (Offline Mode Verification) for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":49099,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"App Killed and Reopened (Offline Mode Verification) for the First Encounter -Es","baseTestName":"App Killed and Reopened (Offline Mode Verification) for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":61823,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Care plan Generation and Regeneration","en":{"name":"Care plan Generation and Regeneration","baseTestName":"Care plan Generation and Regeneration","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":54507,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"SOAP Note Verification for the Second Conversation for the First Encounter","en":null,"es":{"name":"SOAP Note Verification for the Second Conversation for the First Encounter -Es","baseTestName":"SOAP Note Verification for the Second Conversation for the First Encounter","suite":"New Patient","passed":false,"skipped":false,"failed":true,"dur":170445,"err":"searchPatientPage is not defined","isSpanish":true,"status":"broken","hasIssue":true,"issueUrl":"Soap note is not generated Even after long time","issueName":"Soap note is not generated Even after long time"}},{"base":"Third Conversation (Draft Creation and Completion of Draft Transcript) for the First Encounter","en":{"name":"Third Conversation (Draft Creation and Completion of Draft Transcript) for the First Encounter","baseTestName":"Third Conversation (Draft Creation and Completion of Draft Transcript) for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":145748,"err":null,"isSpanish":false,"status":"passed","hasIssue":true,"issueUrl":"The second conversation is saved as a draft","issueName":"The second conversation is saved as a draft"},"es":{"name":"Third Conversation (Draft Creation and Completion of Draft Transcript) for the First Encounter -Es","baseTestName":"Third Conversation (Draft Creation and Completion of Draft Transcript) for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":142173,"err":null,"isSpanish":true,"status":"passed","hasIssue":true,"issueUrl":"the second conversation is saved as a dreaft ","issueName":"the second conversation is saved as a dreaft "}},{"base":"Transcript verification for the first Encounter","en":{"name":"Transcript verification for the first Encounter","baseTestName":"Transcript verification for the first Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":11601,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Transcript verification for the first Encounter -Es","baseTestName":"Transcript verification for the first Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":18214,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Patient Creation","en":{"name":"Patient Creation","baseTestName":"Patient Creation","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":109454,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Patient Creation -Es","baseTestName":"Patient Creation","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":96507,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Patient info update","en":{"name":"Patient info update","baseTestName":"Patient info update","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":22089,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Second Conversation for the First Encounter","en":{"name":"Second Conversation for the First Encounter","baseTestName":"Second Conversation for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":141754,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Second Conversation for the First Encounter -Es","baseTestName":"Second Conversation for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":141828,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"HayNoki update","en":{"name":"HayNoki update","baseTestName":"HayNoki update","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":35611,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"SOAP Note Generation for the Draft Conversation in the First Encounter","en":{"name":"SOAP Note Generation for the Draft Conversation in the First Encounter","baseTestName":"SOAP Note Generation for the Draft Conversation in the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":196272,"err":null,"isSpanish":false,"status":"passed","hasIssue":true,"issueUrl":"Quick Action Button is not displayed even after long wait waiting","issueName":"Quick Action Button is not displayed even after long wait waiting"},"es":null},{"base":"Offline Mode Stop and App Kill Verification for the First Encounter","en":{"name":"Offline Mode Stop and App Kill Verification for the First Encounter","baseTestName":"Offline Mode Stop and App Kill Verification for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":75810,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Offline Mode Stop and App Kill Verification for the First Encounter -Es","baseTestName":"Offline Mode Stop and App Kill Verification for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":89951,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Finalize encounter","en":{"name":"Finalize encounter","baseTestName":"Finalize encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":6185,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Finalize encounter -Es","baseTestName":"Finalize encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":15435,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"SoapNote Regeneration","en":{"name":"SoapNote Regeneration","baseTestName":"SoapNote Regeneration","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":48053,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Feedback Generation and Regeneration","en":{"name":"Feedback Generation and Regeneration","baseTestName":"Feedback Generation and Regeneration","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":67030,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Hay Noki update","en":null,"es":{"name":"Hay Noki update -Es","baseTestName":"Hay Noki update","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":116281,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"App Killed in Offline and Reopened in Online Mode Verification for the First Encounter","en":{"name":"App Killed in Offline and Reopened in Online Mode Verification for the First Encounter","baseTestName":"App Killed in Offline and Reopened in Online Mode Verification for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":53387,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"App Killed in Offline and Reopened in Online Mode Verification for the First Encounter -Es","baseTestName":"App Killed in Offline and Reopened in Online Mode Verification for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":58742,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"SOAP Note generation for the Second Conversation in First Encounter","en":{"name":"SOAP Note generation for the Second Conversation in First Encounter","baseTestName":"SOAP Note generation for the Second Conversation in First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":196583,"err":null,"isSpanish":false,"status":"passed","hasIssue":true,"issueUrl":"The soap note is  genrated instead of showing 'Add Conversation' Button it is showing 'resumeConvesation' is saved as Draft","issueName":"The soap note is  genrated instead of showing 'Add Conversation' Button it is showing 'resumeConvesation' is saved as Draft"},"es":null},{"base":"Referal Generation and Regeneration","en":{"name":"Referal Generation and Regeneration","baseTestName":"Referal Generation and Regeneration","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":46455,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"SOAP Note Generation for the First Encounter","en":{"name":"SOAP Note Generation for the First Encounter","baseTestName":"SOAP Note Generation for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":195910,"err":null,"isSpanish":false,"status":"passed","hasIssue":true,"issueUrl":"Soap note is not generated Even after long time  when we restart the app and open same patient soap note is generated in background","issueName":"Soap note is not generated Even after long time  when we restart the app and open same patient soap note is generated in background"},"es":{"name":"SOAP Note Generation for the First Encounter -Es","baseTestName":"SOAP Note Generation for the First Encounter","suite":"New Patient","passed":false,"skipped":false,"failed":true,"dur":169025,"err":"searchPatientPage is not defined","isSpanish":true,"status":"broken","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"ICD-CPT codes Generation and Regeneration","en":{"name":"ICD-CPT codes Generation and Regeneration","baseTestName":"ICD-CPT codes Generation and Regeneration","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":132562,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"SOAP Note Generation for the Draft Conversation for the First Encounter","en":null,"es":{"name":"SOAP Note Generation for the Draft Conversation for the First Encounter -Es","baseTestName":"SOAP Note Generation for the Draft Conversation for the First Encounter","suite":"New Patient","passed":false,"skipped":false,"failed":true,"dur":169867,"err":"searchPatientPage is not defined","isSpanish":true,"status":"broken","hasIssue":true,"issueUrl":"Soap Note is not generated even after showing loading Page in multiple conversation","issueName":"Soap Note is not generated even after showing loading Page in multiple conversation"}},{"base":"Transcript Verification for the Second Conversation for the First Encounter","en":null,"es":{"name":"Transcript Verification for the Second Conversation for the First Encounter -Es","baseTestName":"Transcript Verification for the Second Conversation for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":42838,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Transcript verification for the Second Conversation in First Encounter","en":{"name":"Transcript verification for the Second Conversation in First Encounter","baseTestName":"Transcript verification for the Second Conversation in First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":11749,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null}],"stats":{"total":26,"passed":22,"failed":4,"skipped":0}},{"name":"Settings","pairs":[{"base":"Verify Setting's screen support_Verification","en":{"name":"Verify Setting's screen support_Verification ","baseTestName":"Verify Setting's screen support_Verification","suite":"Settings","passed":true,"skipped":false,"failed":false,"dur":24809,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Verify Setting's screen launguage and general settings","en":{"name":"Verify Setting's screen launguage and general settings","baseTestName":"Verify Setting's screen launguage and general settings","suite":"Settings","passed":true,"skipped":false,"failed":false,"dur":15037,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Verify Setting's screen general settings","en":{"name":"Verify Setting's screen general settings","baseTestName":"Verify Setting's screen general settings","suite":"Settings","passed":true,"skipped":false,"failed":false,"dur":51651,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Verify Settings screen Profille Edit #Skipped:-proffile edit is skipped due to Known Issue, related to Api change","en":{"name":"Verify Settings screen Profille Edit #Skipped:-proffile edit is skipped due to Known Issue, related to Api change","baseTestName":"Verify Settings screen Profille Edit #Skipped:-proffile edit is skipped due to Known Issue, related to Api change","suite":"Settings","passed":false,"skipped":true,"failed":false,"dur":1,"err":null,"isSpanish":false,"status":"skipped","hasIssue":false,"issueUrl":null,"issueName":null},"es":null}],"stats":{"total":4,"passed":3,"failed":0,"skipped":1}},{"name":"Login","pairs":[{"base":"Login Error message verification: \"Password not Provided\"","en":{"name":"Login Error message verification: \"Password not Provided\"","baseTestName":"Login Error message verification: \"Password not Provided\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":14183,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Login with correct credential and verify Home screen animation","en":null,"es":{"name":"Login with correct credential and verify Home screen animation -Es","baseTestName":"Login with correct credential and verify Home screen animation","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":18016,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Login Error message verification: \"password not provided\"","en":null,"es":{"name":"Login Error message verification: \"password not provided\" -Es ","baseTestName":"Login Error message verification: \"password not provided\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":15277,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Login Error message verification: \"unregistered mail\"","en":{"name":"Login Error message verification: \"unregistered mail\"","baseTestName":"Login Error message verification: \"unregistered mail\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":8161,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Login Error message verification: \"unregistered mail\" -Es","baseTestName":"Login Error message verification: \"unregistered mail\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":8763,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Login Error message verifcation: \"invalid Email\"","en":null,"es":{"name":"Login Error message verifcation: \"invalid Email\" -Es","baseTestName":"Login Error message verifcation: \"invalid Email\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":9370,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Login Error message verification: \"Email not provided\"","en":null,"es":{"name":"Login Error message verification: \"Email not provided\" -Es","baseTestName":"Login Error message verification: \"Email not provided\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":8758,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Login Error message verification: \"wrong password\"","en":{"name":"Login Error message verification: \"wrong password\"","baseTestName":"Login Error message verification: \"wrong password\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":16394,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Login Error message verification: \"Wrong password\"","en":null,"es":{"name":"Login Error message verification: \"Wrong password\" -Es","baseTestName":"Login Error message verification: \"Wrong password\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":17651,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Login Error message verification: \"short password\"","en":null,"es":{"name":"Login Error message verification: \"short password\" -Es","baseTestName":"Login Error message verification: \"short password\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":16011,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Login with correct credentials & verify Home screen","en":{"name":"Login with correct credentials & verify Home screen","baseTestName":"Login with correct credentials & verify Home screen","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":26942,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Login Error message verification: \"short Password\"","en":{"name":"Login Error message verification: \"short Password\"","baseTestName":"Login Error message verification: \"short Password\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":17057,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Login Error messge verification: \"Email is not provided\"","en":{"name":"Login Error messge verification: \"Email is not provided\"","baseTestName":"Login Error messge verification: \"Email is not provided\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":8840,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null},{"base":"Login Error message verification: \"invalid Email\"","en":{"name":"Login Error message verification: \"invalid Email\"","baseTestName":"Login Error message verification: \"invalid Email\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":9080,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null}],"stats":{"total":13,"passed":13,"failed":0,"skipped":0}},{"name":"Forgot Password","pairs":[{"base":"Error message verification: \"Invalid Email\"","en":{"name":"Error message verification: \"Invalid Email\"","baseTestName":"Error message verification: \"Invalid Email\"","suite":"Forgot Password","passed":true,"skipped":false,"failed":false,"dur":9983,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Error message verification: \"Invalid Email\" -Es","baseTestName":"Error message verification: \"Invalid Email\"","suite":"Forgot Password","passed":true,"skipped":false,"failed":false,"dur":11509,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Error message verification: \"Email is not rigisterd\"","en":{"name":"Error message verification: \"Email is not rigisterd\"","baseTestName":"Error message verification: \"Email is not rigisterd\"","suite":"Forgot Password","passed":true,"skipped":false,"failed":false,"dur":12238,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Error message verification: \"Email is not rigisterd\" -Es","baseTestName":"Error message verification: \"Email is not rigisterd\"","suite":"Forgot Password","passed":true,"skipped":false,"failed":false,"dur":14490,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Error message verifcation: \"Email not Enterd\"","en":{"name":"Error message verifcation: \"Email not Enterd\"","baseTestName":"Error message verifcation: \"Email not Enterd\"","suite":"Forgot Password","passed":true,"skipped":false,"failed":false,"dur":10356,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":{"name":"Error message verifcation: \"Email not Enterd\" -Es","baseTestName":"Error message verifcation: \"Email not Enterd\"","suite":"Forgot Password","passed":true,"skipped":false,"failed":false,"dur":11516,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Verify Reset Password mail generation","en":null,"es":{"name":"Verify Reset Password mail generation -Es","baseTestName":"Verify Reset Password mail generation","suite":"Forgot Password","passed":true,"skipped":false,"failed":false,"dur":35565,"err":null,"isSpanish":true,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null}},{"base":"Verify Rest Password mail generation","en":{"name":"Verify Rest Password mail generation","baseTestName":"Verify Rest Password mail generation","suite":"Forgot Password","passed":true,"skipped":false,"failed":false,"dur":21993,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null}],"stats":{"total":5,"passed":5,"failed":0,"skipped":0}},{"name":"Setting","pairs":[{"base":"Verify Setting's screen general settings","en":{"name":"Verify Setting's screen general settings ","baseTestName":"Verify Setting's screen general settings","suite":"Setting","passed":true,"skipped":false,"failed":false,"dur":37539,"err":null,"isSpanish":false,"status":"passed","hasIssue":false,"issueUrl":null,"issueName":null},"es":null}],"stats":{"total":1,"passed":1,"failed":0,"skipped":0}}],"stats":{"total":110,"passed":95,"failed":14,"skipped":1},"meta":{"platform":"iOS","reportDate":"2/19/2026, 3:01:59 PM","reportTS":"2026-02-19T09:31:59.725Z"}};
 
-const englishText =
-    group.english?.wasRetried
-        ? englishBase + " 🔁"
-        : englishBase;
+function sc(t){
+  if(!t)return'not-run';
+  if(t.skipped)return'skipped';
+  if(t.passed)return'passed';
+  if(t.failed)return'failed';
+  return'not-run';
+}
+function sl(t){
+  if(!t)return'N/R';
+  if(t.skipped)return'SKIP';
+  if(t.passed)return'PASS';
+  if(t.failed)return'FAIL';
+  return'N/R';
+}
+function slIcon(t){
+  if(!t)return'&mdash; N/R';
+  if(t.skipped)return'&#8855; SKIP';
+  if(t.passed)return'&#10003; PASS';
+  if(t.failed)return'&#10007; FAIL';
+  return'&mdash; N/R';
+}
+function issHtml(t,uid){
+  if(!t||!t.hasIssue)return'';
+  var text=(t.issueName||'Known Issue').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  var linkHtml=t.issueUrl
+    ? '<a class="iss-drop-link" href="'+t.issueUrl+'" target="_blank" rel="noopener">&#128279; Open in tracker</a>'
+    : '';
+  return(
+    '<span class="iss-wrap" id="issw-'+uid+'">'+
+      '<span class="ib" onclick="toggleIss(this,event)">!</span>'+
+      '<div class="iss-drop" id="issd-'+uid+'">'+
+        '<div class="iss-drop-hdr">'+
+          '<span class="iss-drop-title">&#9888; Known Issue</span>'+
+          '<span class="iss-drop-close" onclick="closeIss(this,event)">&times;</span>'+
+        '</div>'+
+        '<div class="iss-drop-body">'+
+          '<div class="iss-drop-text">'+text+'</div>'+
+          linkHtml+
+        '</div>'+
+      '</div>'+
+    '</span>'
+  );
+}
+function toggleIss(btn,e){
+  e.stopPropagation();
+  var drop=btn.nextElementSibling;
+  var isOpen=drop.classList.contains('show');
+  document.querySelectorAll('.iss-drop.show').forEach(function(d){d.classList.remove('show');});
+  document.querySelectorAll('.ib.open').forEach(function(b){b.classList.remove('open');});
+  if(!isOpen){drop.classList.add('show');btn.classList.add('open');}
+}
+function closeIss(closeBtn,e){
+  e.stopPropagation();
+  var drop=closeBtn.closest('.iss-drop');
+  drop.classList.remove('show');
+  drop.previousElementSibling.classList.remove('open');
+}
+document.addEventListener('click',function(){
+  document.querySelectorAll('.iss-drop.show').forEach(function(d){d.classList.remove('show');});
+  document.querySelectorAll('.ib.open').forEach(function(b){b.classList.remove('open');});
+});
+function errTip(t){
+  if(!t||!t.failed||!t.err)return'';
+  var safe=t.err.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return'<span class="err-tip">'+safe+'</span>';
+}
 
-const spanishText =
-    group.spanish?.wasRetried
-        ? spanishBase + " 🔁"
-        : spanishBase;
+var suitesCont=document.getElementById('suites');
+var rowIdx=0;
 
-                
-                const input = document.querySelector(`input[data-test-index="${group.index}"]`);
-                const comment = input ? input.value.replace(/,/g, ';').replace(/"/g, '""') : '';
-                
-                csv += `"${group.baseTestName}","${englishText}","${spanishText}","${comment}"\n`;
-            });
-            
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'test-report-' + REPORT_DATA.meta.reportTimestamp.split('T')[0] + '.csv';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-        }
-        
-        window.addEventListener('load', loadData);
-    </script>
+D.suites.forEach(function(suite,si){
+  var name=suite.name, pairs=suite.pairs, stats=suite.stats;
+  var block=document.createElement('div');
+  block.className='sblock';
+  block.setAttribute('data-si',si);
+
+  var failPill=stats.failed ?'<span class="pill f">&#10007; '+stats.failed+' failed</span>':'';
+  var skipPill=stats.skipped?'<span class="pill s">&#8855; '+stats.skipped+' skipped</span>':'';
+
+  block.innerHTML=
+    '<div class="shdr" onclick="toggle('+si+')">'+
+      '<div class="chev"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><path d="M2 1.5L6.5 4.5L2 7.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'+
+      '<div class="sname">'+name+'</div>'+
+      '<div class="pills-c">'+
+        '<span class="pill t">'+stats.total+' tests</span>'+
+        '<span class="pill p">&#10003; '+stats.passed+'</span>'+
+      '</div>'+
+      '<div class="pills-e">'+
+        '<span class="pill t">'+stats.total+' total</span>'+
+        '<span class="pill p">&#10003; '+stats.passed+' passed</span>'+
+        failPill+skipPill+
+      '</div>'+
+    '</div>';
+
+  var body=document.createElement('div');
+  body.className='sbody';
+
+  var table=document.createElement('table');
+  table.className='ttbl';
+  table.innerHTML='<thead><tr><th>Test Case</th><th>English</th><th>Spanish</th><th>Comments</th></tr></thead>';
+
+  var tbody=document.createElement('tbody');
+
+  pairs.forEach(function(pair){
+    var base=pair.base, en=pair.en, es=pair.es;
+    var key=rowIdx++;
+    var enSC=sc(en), esSC=sc(es);
+    var anyIssue=(en&&en.hasIssue)||(es&&es.hasIssue);
+
+    var tr=document.createElement('tr');
+    tr.setAttribute('data-k',key);
+    tr.setAttribute('data-en',enSC);
+    tr.setAttribute('data-es',esSC);
+    tr.setAttribute('data-iss',anyIssue?'1':'0');
+
+    tr.innerHTML=
+      '<td class="tname">'+base+(issHtml(en,'en'+key)||issHtml(es,'es'+key))+'</td>'+
+      '<td><span class="sb '+enSC+'">'+slIcon(en)+errTip(en)+'</span></td>'+
+      '<td><span class="sb '+esSC+'">'+slIcon(es)+errTip(es)+'</span></td>'+
+      '<td><input class="ci" type="text" data-k="'+key+'" placeholder="Add comment" oninput="saveC('+key+',this.value)"/></td>';
+
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(tbody);
+  body.appendChild(table);
+  block.appendChild(body);
+  suitesCont.appendChild(block);
+});
+
+document.getElementById('sTotal').textContent=D.stats.total;
+document.getElementById('sPassed').textContent=D.stats.passed;
+document.getElementById('sFailed').textContent=D.stats.failed;
+document.getElementById('sSkipped').textContent=D.stats.skipped;
+document.getElementById('hdrMeta').textContent='Platform: '+D.meta.platform+'  |  Generated: '+D.meta.reportDate;
+
+function toggle(si){
+  document.querySelector('.sblock[data-si="'+si+'"]').classList.toggle('open');
+}
+function expandAll(){
+  document.querySelectorAll('.sblock:not(.gone)').forEach(function(b){b.classList.add('open');});
+}
+function collapseAll(){
+  document.querySelectorAll('.sblock').forEach(function(b){b.classList.remove('open');});
+}
+
+function setF(f){
+  document.querySelectorAll('.fbtn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-f')===f);});
+  var vis=0;
+  document.querySelectorAll('.sblock').forEach(function(block){
+    var hits=0;
+    block.querySelectorAll('tbody tr').forEach(function(row){
+      var enS=row.getAttribute('data-en'), esS=row.getAttribute('data-es'), iss=row.getAttribute('data-iss');
+      var show=
+        f==='all'    ?true:
+        f==='passed' ?(enS==='passed' ||esS==='passed'):
+        f==='failed' ?(enS==='failed' ||esS==='failed'):
+        f==='skipped'?(enS==='skipped'||esS==='skipped'):
+        f==='notrun' ?(enS==='not-run'||esS==='not-run'):
+        f==='issue'  ?(iss==='1'):true;
+      row.classList.toggle('hide',!show);
+      if(show)hits++;
+    });
+    var hide=hits===0;
+    block.classList.toggle('gone',hide);
+    if(!hide){vis++;block.classList.add('open');}
+  });
+  document.getElementById('nores').classList.toggle('show',vis===0);
+}
+
+function saveC(k,v){
+  try{
+    localStorage.setItem('c_'+k,v);
+    var el=document.getElementById('sind');
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t=setTimeout(function(){el.classList.remove('show');},1800);
+  }catch(e){}
+}
+function loadC(){
+  document.querySelectorAll('.ci').forEach(function(inp){
+    var v=localStorage.getItem('c_'+inp.getAttribute('data-k'));
+    if(v)inp.value=v;
+  });
+}
+function exportCSV(){
+  function esc(s){return'"'+String(s).replace(/"/g,'""')+'"';}
+  var rows=[['Suite','Test Case','Issue','English','Spanish','Comment']];
+  var k=0;
+  D.suites.forEach(function(suite){
+    suite.pairs.forEach(function(pair){
+      var en=pair.en,es=pair.es;
+      var iss=(en&&en.hasIssue)||(es&&es.hasIssue)?((en&&en.issueName)||(es&&es.issueName)||'yes'):'';
+      var comment=localStorage.getItem('c_'+k)||'';
+      rows.push([suite.name,pair.base,iss,sl(en),sl(es),comment]);
+      k++;
+    });
+  });
+  var csv=rows.map(function(r){return r.map(esc).join(',');}).join('\n');
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  a.download='test-report-'+D.meta.reportTS.split('T')[0]+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+window.addEventListener('load',loadC);
+
+</script>
 </body>
 </html>

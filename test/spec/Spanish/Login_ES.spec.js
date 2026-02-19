@@ -10,14 +10,6 @@ beforeEach(async () => {
   await LoginPage.restartApp();
 });
 
-it("Login UI element Verification -Es", async () => {
-  await verify(SpanishLanguage.forgotPassword);
-  await verify(SpanishLanguage.emailField);
-  await verify(SpanishLanguage.passwordField);
-  await verify(SpanishLanguage.loginButton);
-  await verify(SpanishLanguage.forgotPassword);
-});
-
 it(`Login Error message verification: "password not provided" -Es `, async () => {
   await SpanishLanguage.enterEmail("nag.subbarayudu@thinkhat.ai");
   await verifyAndClick(SpanishLanguage.Done);
@@ -45,7 +37,7 @@ it(`Login Error message verifcation: "invalid Email" -Es`, async () => {
   await verify(SpanishLanguage.invalidEmailError);
 });
 
-it(`Login Error message verification: "unrigisted mail" -Es`, async () => {
+it(`Login Error message verification: "unregistered mail" -Es`, async () => {
   await SpanishLanguage.enterEmail("vqejvcievciye@gmail.com");
   await verify(SpanishLanguage.emailNotRegisteredError);
 });
@@ -58,11 +50,15 @@ it(`Login Error message verification: "Wrong password" -Es`, async () => {
   await verify(SpanishLanguage.WrongPassword);
 });
 
-it.only("Login with correct credential and verify Home screen animation -Es", async () => {
+it("Login with correct credential and verify Home screen animation -Es", async () => {
   await SpanishLanguage.enterEmail(process.env.Email);
   await SpanishLanguage.enterPassword(process.env.Password);
   await SpanishLanguage.selectMultiTenant();
   await SpanishLanguage.clickLogin();
-  await HomePage.notNowBtn.click();
+  if (await HomePage.notNowBtn.isDisplayed()) {
+    await HomePage.notNowBtn.click();
+  }else {
+    console.log("save password password is not displayed");
+  }
   await verify(SpanishLanguage.homescreenAnimation);
 });

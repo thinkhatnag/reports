@@ -104,12 +104,12 @@ export const config = {
     // "./test/spec/English/Login.spec.js",
     // "./test/spec/English/Setting.spec.js",
     // "./test/spec/English/New_Patient.spec.js",
-    "./test/spec/English/Existing_Patient.spec.js",
+    // "./test/spec/English/Existing_Patient.spec.js",
     // "./test/spec/Spanish/Forgot_Password_ES.spec.js",
     // "./test/spec/Spanish/Login_Es.spec.js",
     // "./test/spec/Spanish/Settings_ES.spec.js",
     // "./test/spec/Spanish/New_Patient_ES.spec.js",
-    // "./test/spec/Spanish/Existing_Patient_ES.spec.js",
+    "./test/spec/Spanish/Existing_Patient_ES.spec.js",
     // './test/spec/Test.spec.js',
   ],
   // Patterns to exclude.
@@ -471,6 +471,17 @@ export const config = {
       duration: duration,
       error: error ? error.message : null,
       isSpanish: isSpanish,
+      afterTest: async function (test, context, { passed }) {
+        if (!passed) {
+          const screenshot = await browser.takeScreenshot();
+
+          allureReporter.addAttachment(
+            "Screenshot on Failure",
+            Buffer.from(screenshot, "base64"),
+            "image/png",
+          );
+        }
+      },
     });
 
     console.log("✓ Pushed. Total:", global.testResults.length);

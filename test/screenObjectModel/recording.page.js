@@ -547,7 +547,7 @@ class RecordingPage {
     if (
       await this.resumeConversationForMultipleConverstionScenario.isDisplayed()
     ) {
-      allureRepoter.addIssue("The previous encounter is saved as a dreaft ");
+      allureRepoter.addIssue("The second conversation is saved as a draft");
       await this.resumeConversationForMultipleConverstionScenario.click();
       await this.resumeConversationForMultipleConverstionScenarioYes.click();
     } else if (await this.AddConversation.isDisplayed()) {
@@ -556,9 +556,6 @@ class RecordingPage {
     }
     await verify(this.pauseBtn);
     await this.recordAudioAndSaveAsDraft();
-    console.log(
-      "Here we are making the transcription as draft for verifying the flow of the draft trancript resuming and finalizing Encounter with a draft transcript.",
-    );
     await driver.pause(3000);
     await LoginPage.restartApp();
     await waitForElement(HomePage.encounter);
@@ -573,24 +570,19 @@ class RecordingPage {
     await verifyAndClick(
       this.resumeConversationForMultipleConverstionScenarioYes,
     );
-    console.log(
-      "Here we are continueng our converstion  with a draft transcription",
-    );
     await this.recordAudio();
   }
 
   async third_Conversations_For_New_Patient() {
-    if (
-      await this.resumeConversationForMultipleConverstionScenario.isDisplayed()
-    ) {
-      allureRepoter.addIssue("the previous encounter is saved as a dreaft ");
-      await this.resumeConversationForMultipleConverstionScenario.click();
-      await this.resumeConversationForMultipleConverstionScenarioYes.click();
-    } else if (await this.AddConversation.isDisplayed()) {
-      await verifyAndClick(this.AddConversation);
-      await verifyAndClick(this.AddConversationConfirmationYes);
+    await this.multiple_Conversation();
+    if (await this.PrevEncounterRef.isDisplayed()) {
+      allureRepoter.addIssue(
+        "For the first Encounter it is showing previus Encounter Refernce",
+      );
+      await this.PrevEncounterRefNo.click();
+    } else {
+      console.log("Issue got resolved");
     }
-    await this.recordAudio();
   }
   async third_Conversation_For_Existing_Patient() {
     await this.multiple_Conversation();
@@ -861,7 +853,7 @@ class RecordingPage {
   async manualUpdate() {
     await waitForElement(this.SoapNoteScreenTxtField);
     await verifyAndClick(this.SoapNoteScreenTxtField);
-    await this.SoapNoteScreenTxtFieldEntry.setValue("Blood Group O negitive");
+    await this.SoapNoteScreenTxtFieldEntry.setValue("Blood Group O negative");
     // await verifyAndClick(this.returnBtn);
     await verifyAndClick(this.send);
     await waitForElement(this.C_OK);

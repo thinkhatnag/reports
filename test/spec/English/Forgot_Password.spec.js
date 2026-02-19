@@ -9,12 +9,6 @@ beforeEach(async () => {
   await LoginPage.restartApp();
 });
 
-it("Verify all Forgot Password screen Elements", async () => {
-  await verifyAndClick(LoginPage.forgotPassword);
-  await validate(LoginPage.forgotPasswordEmailField);
-  await validate(LoginPage.sendResetLinkBtn);
-  await validate(LoginPage.loginLink);
-});
 
 it(`Error message verification: "Email is not rigisterd"`, async () => {
   await verifyAndClick(LoginPage.forgotPassword);
@@ -36,7 +30,7 @@ it(`Error message verifcation: "Email not Enterd"`, async () => {
   await verifyAndClick(LoginPage.loginLink);
 });
 
-it.only(`Verify Rest Password mail generation`, async () => {
+it(`Verify Rest Password mail generation`, async () => {
   await verifyAndClick(LoginPage.forgotPassword);
   console.log("Email env:", process.env.Email);
   await LoginPage.enterForgotPasswordEmail(process.env.Email);

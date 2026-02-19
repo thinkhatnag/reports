@@ -37,7 +37,7 @@ it("Automatic Sync Verification (Offline to Online and Vice Versa)", async () =>
   await AudioManeger.pauseAudio();
   console.log("Audio paused at:", AudioManeger.pausedTime, "seconds");
   await driver.pause(5000);
-  await verifyAndClick(RecordingPage.playBtn);
+  await RecordingPage.playBtn.click();
 });
 it("App Killed and Reopened (Offline Mode Verification)", async () => {
   await AudioManeger.resumeAudio(); //correct
@@ -51,7 +51,6 @@ it("App Killed and Reopened (Offline Mode Verification)", async () => {
   await driver.terminateApp(process.env.BUNDLE_ID);
   await driver.pause(3000);
   await driver.activateApp(process.env.BUNDLE_ID);
-  // await verifyAndClick(RecordingPage.errorOk)    // debug app step will not be avalable in the test/prod
   await waitForElement(RecordingPage.ContinueBtn);
   await verifyAndClick(RecordingPage.ContinueBtn);
 });
@@ -73,7 +72,6 @@ it("App Killed in Offline and Reopened in Online Mode Verification", async () =>
 it("Offline Mode Stop and App Kill Verification", async () => {
   await aeroplanemodeswipe(); //offline
   await AudioManeger.resumeAudio();
-  await RecordingPage.playBtn.click();
   await driver.pause(30000);
   await AudioManeger.stopAudio();
   await verifyAndClick(RecordingPage.stopBtn);
@@ -96,30 +94,36 @@ it("Offline Mode Stop and App Kill Verification", async () => {
 it("SOAP Note Generation For New Encounter", async () => {
   try {
     await waitForElement(QuickActions.quickActionButton);
-  } catch (error) {
+  } catch {
+    allureReporter.addIssue("Soap note is not generated Even after long time ");
+    await driver.terminateApp(process.env.BUNDLE_ID);
+    await driver.pause(5000);
+    await driver.activateApp(process.env.BUNDLE_ID);
+    await driver.pause(5000);
+    await HomePage.patients.click();
+    await PatientsPage.patientSearchAndContinue("Naga");
+    await PatientsPage.encounterSelection();
+    await driver.pause(5000);
     if (await QuickActions.quickActionButton.isDisplayed()) {
-      await RecordingPage.SOAPNote_Verification();
-    } else {
       allureReporter.addIssue(
-        "Quick Action Button is not displayed even after long wait waiting",
+        "Soap note is not generated Even after long time but whwn we kill the app and re open the same patient encouter the soap note is generated in background",
       );
-      await driver.terminateApp(process.env.BUNDLE_ID);
-      await driver.pause(5000);
-      await driver.activateApp(process.env.BUNDLE_ID);
-      await driver.pause(5000);
-      await HomePage.patients.click();
-      await PatientsPage.patientSearchAndContinue("Naga");
-      if (await PatientsPage.firstEncounter.isDisplayed()) {
-        await PatientsPage.firstEncounter.click();
-      } else {
-        await PatientsPage.firstEncounterForExistingPatient.click();
-      }
-      await driver.pause(5000);
     }
   }
+
   await RecordingPage.SOAPNote_Verification();
 });
 it("Transcript Verification for the First Conversation", async () => {
+  await waitForElement(QuickActions.quickActionButton);
+  if (await QuickActions.quickActionButton.isDisplayed()) {
+    await RecordingPage.Transcript.click();
+  } else {
+    await LoginPage.restartApp();
+    await waitForElement(HomePage.startConversationBtn);
+    await HomePage.patients.click();
+    await PatientsPage.patientSearchAndContinue("Naga");
+    await PatientsPage.encounterSelection();
+  }
   await RecordingPage.Transcript_Verification();
 });
 it("Second Conversation for the New Encounter", async () => {
@@ -127,7 +131,9 @@ it("Second Conversation for the New Encounter", async () => {
   if (
     await RecordingPage.resumeConversationForMultipleConverstionScenario.isDisplayed()
   ) {
-    allureReporter.addIssue("the previous encounter is saved as a dreaft ");
+    allureReporter.addIssue(
+      `the soap note is  genrated instead of showing 'Add Conversation' Button it is showing 'resumeConvesation'`,
+    );
     await RecordingPage.resumeConversationForMultipleConverstionScenario.click();
     await RecordingPage.resumeConversationForMultipleConverstionScenarioYes.click();
   } else if (await RecordingPage.AddConversation.isDisplayed()) {
@@ -137,7 +143,7 @@ it("Second Conversation for the New Encounter", async () => {
   await AudioManeger.playAudio("english");
   await driver.pause(5000);
 
-  await aeroplaneModeOff(); //offline
+  await aeroplaneModeOn(); //offline
   await driver.pause(80000);
   await AudioManeger.stopAudio();
   await driver.terminateApp(process.env.BUNDLE_ID); //app killed
@@ -149,36 +155,55 @@ it("Second Conversation for the New Encounter", async () => {
   await waitForElement(RecordingPage.ContinueBtn);
   await verifyAndClick(RecordingPage.endEncounter);
   await driver.pause(5000);
+  if (await RecordingPage.stopBtn.isDisplayed()) {
+    await verifyAndClick(RecordingPage.stopBtn);
+    await verifyAndClick(RecordingPage.PrevEncounterRefYes);
+    allureReporter.addIssue(
+      "Here even after clicking End Encouter, soap note generation is not Intiated",
+    );
+  } else {
+    console.log("issue related to api is resolved");
+  }
   await waitForElement(RecordingPage.PrevEncounterRef);
   await RecordingPage.PrevEncounterRefYes.click();
 });
 it("SOAP Note generation for the Second Conversation", async () => {
   try {
     await waitForElement(QuickActions.quickActionButton);
-  } catch (error) {
-    if (await QuickActions.quickActionButton.isDisplayed()) {
-      await RecordingPage.SOAPNote_Verification();
-    } else {
-      allureReporter.addIssue(
-        "Quick Action Button is not displayed even after long wait waiting",
-      );
-      await driver.terminateApp(process.env.BUNDLE_ID);
-      await driver.pause(5000);
-      await driver.activateApp(process.env.BUNDLE_ID);
-      await driver.pause(5000);
-      await HomePage.patients.click();
-      await PatientsPage.patientSearchAndContinue("Naga");
-      if (await PatientsPage.firstEncounter.isDisplayed()) {
-        await PatientsPage.firstEncounter.click();
-      } else {
-        await PatientsPage.firstEncounterForExistingPatient.click();
-      }
-      await driver.pause(5000);
-    }
+  } catch {
+    await driver.terminateApp(process.env.BUNDLE_ID);
+    await driver.pause(5000);
+    await driver.activateApp(process.env.BUNDLE_ID);
+    await driver.pause(5000);
+    await HomePage.patients.click();
+    await PatientsPage.patientSearchAndContinue("Naga");
+    await PatientsPage.encounterSelection();
+    await driver.pause(5000);
+  }
+  if (await RecordingPage.AddConversation.isDisplayed()) {
+    allureReporter.addIssue(
+      "Soap note is not generated Even after long time when we restart the app and open same patient soap note is generated in background",
+    );
+  } else if (
+    await RecordingPage.resumeConversationForMultipleConverstionScenario.isDisplayed()
+  ) {
+    allureReporter.addIssue(
+      `The soap note is  genrated instead of showing 'Add Conversation' Button it is showing 'resumeConvesation' is saved as Draft`,
+    );
   }
   await RecordingPage.SOAPNote_Verification();
 });
 it("Transcript Verification for the Second Conversation", async () => {
+  await waitForElement(QuickActions.quickActionButton);
+  if (await QuickActions.quickActionButton.isDisplayed()) {
+    await RecordingPage.Transcript.click();
+  } else {
+    await LoginPage.restartApp();
+    await waitForElement(HomePage.startConversationBtn);
+    await HomePage.patients.click();
+    await PatientsPage.patientSearchAndContinue("Naga");
+    await PatientsPage.encounterSelection();
+  }
   await RecordingPage.Transcript_Verification();
 });
 it("Third Conversation (Draft Creation and Completion of Draft Transcript)", async () => {
@@ -201,11 +226,7 @@ it("SOAP Note Generation for the Draft Conversation", async () => {
       await driver.pause(5000);
       await HomePage.patients.click();
       await PatientsPage.patientSearchAndContinue("Naga");
-      if (await PatientsPage.firstEncounter.isDisplayed()) {
-        await PatientsPage.firstEncounter.click();
-      } else {
-        await PatientsPage.firstEncounterForExistingPatient.click();
-      }
+      await PatientsPage.encounterSelection();
       await driver.pause(5000);
     }
   }
@@ -213,14 +234,32 @@ it("SOAP Note Generation for the Draft Conversation", async () => {
 });
 
 it("Transcript Verification for the Draft Conversation", async () => {
+  await waitForElement(QuickActions.quickActionButton);
+  if (await QuickActions.quickActionButton.isDisplayed()) {
+    await RecordingPage.Transcript.click();
+  } else {
+    await LoginPage.restartApp();
+    await waitForElement(HomePage.startConversationBtn);
+    await HomePage.patients.click();
+    await PatientsPage.patientSearchAndContinue("Naga");
+    await PatientsPage.encounterSelection();
+  }
   await RecordingPage.Transcript_Verification();
 });
 
-it("Quick Action Templates generation and regeneration", async () => {
+it("ICD-CPT codes Generation and Regeneration", async () => {
   await QuickActions.ICD_CPT();
+});
+it("Care plan Generation and Regeneration", async () => {
   await QuickActions.care_Plan();
+});
+it("Feedback Generation and Regeneration", async () => {
   await QuickActions.feed_back();
+});
+it("Referal Generation and Regeneration", async () => {
   await QuickActions.referal_Letter();
+});
+it("SoapNote Regeneration", async () => {
   await QuickActions.SOAPNote();
 });
 it("Patient Info Update", async () => {

@@ -9,7 +9,7 @@ import {
 } from "../../helpers/helper.js";
 import AudioManager from "../screenObjectModel/audioManeger.js";
 import { faker } from "@faker-js/faker";
-
+import searchPatientPage from "./searchPatient.page.js";
 import LoginPage from "../screenObjectModel/login.page.js";
 import RecordingPage from "../screenObjectModel/recording.page.js";
 import HomePage from "../screenObjectModel/home.page.js";
@@ -1075,35 +1075,35 @@ class SpanishLanguage {
     return $("~Generar Códigos ICD y CPT");
   }
   get generateCarePlan() {
-    return $("~Generar plan de atención con explicación");
+    return $("~Generar Plan de atención con explicación");
   }
   get generateFeedBack() {
-    return $("~Generar comentarios sobre el desempeño del médico");
+    return $("~Generar Comentarios sobre el desempeño del médico");
   }
   get generateReferalLetter() {
-    return $("~Generar carta de derivación");
+    return $("~Generar Carta de derivación");
   }
   get icdAndCptCodes() {
     return $("~Códigos ICD y CPT");
   }
 
   get regenerateIcdAndCpt() {
-    return $("~Regenerar códigos ICD y CPT");
+    return $("~Regenerar Códigos ICD y CPT");
   }
   get regenerateCarePlan() {
-    return $(`~Regenerar plan de atención con explicación`);
+    return $(`~Regenerar Códigos ICD y CPT`);
   }
   get carePlan() {
     return $("~Plan de atención con explicación");
   }
   get regenerateFeedBack() {
-    return $("~Regenerar comentarios sobre el desempeño del médico");
+    return $("~Regenerar Comentarios sobre el desempeño del médico");
   }
   get feedBack() {
     return $("~Comentarios sobre el desempeño del médico");
   }
   get regenerateReferalLetter() {
-    return $("~Regenerar carta de derivación");
+    return $("~Regenerar Carta de derivación");
   }
   get referalLetter() {
     return $("~Carta de derivación");
@@ -1408,13 +1408,14 @@ class SpanishLanguage {
     await this.PatientSearchTextField.setValue(patientName);
     await this.SearchBtn.click();
   }
-  async patentElement(patientName) {
+  async patientElement(patientName) {
     await $(`//XCUIElementTypeStaticText[@name="${patientName}`).click();
   }
   async patientSearchAndContinue(patientName) {
     await this.Search(patientName);
     await driver.pause(2000);
-    await this.patentElement(patientName);
+    const patientElement = await searchPatientPage.patientName(patientName);
+    await verifyAndClick(patientElement);
   }
   //Search Patient
   async patientSearch(patient) {
@@ -1425,9 +1426,16 @@ class SpanishLanguage {
     await verifyAndClick(patientElement);
     await verifyAndClick(this.proceedBTn);
   }
+  get acceptAndContinueBtn() {
+    return $(
+      '-ios class chain:**/XCUIElementTypeButton[`name == "Aceptar y Continuar"`]',
+    );
+  }
+
   async startConversation() {
-    await verifyAndClick(RecordingPage.acknowledgeCheckBox);
-    await verifyAndClick(this.startConversationBtn);
+    await waitForElement(this.startConversationBtn);
+    await this.startConversationBtn.click();
+    await this.acceptAndContinueBtn.click();
   }
 
   async startNewConveresation(patitent) {
@@ -1444,24 +1452,9 @@ class SpanishLanguage {
     await AudioManeger.playAudio("spanish");
     await driver.pause(60000);
     await AudioManeger.stopAudio();
-    await verifyAndClick(this.pauseBtn);
     await verifyAndClick(this.stopBtn);
   }
-  async recordOfflineAudio() {
-    await driver.pause(4000);
-    await AudioManeger.playAudio("spanish");
-    await driver.pause(5000);
-    await aeroplaneModeOn();
-    await driver.pause(5000);
-    await verify(this.offlineModeTranscription);
-    await driver.pause(40000);
-    await aeroplaneModeOff();
-    await driver.pause(5000);
-    await driver.pause(20000);
-    await AudioManeger.stopAudio();
-    await verifyAndClick(this.pauseBtn);
-    await verifyAndClick(this.stopBtn);
-  }
+
   async CDSS_verification() {
     if (await this.notEnoughTranscript.isDisplayed()) {
       console.error(
@@ -1492,7 +1485,6 @@ class SpanishLanguage {
     await driver.pause(3000);
   }
   async Transcript_Verification() {
-    await waitForElement(this.quickActionButton)
     await verifyAndClick(this.Transcript);
     await RecordingPage.dataScaning(RecordingPage.cleanedTranscriptScroll);
     await verifyAndClick(this.originalTrnscript);
@@ -1518,16 +1510,10 @@ class SpanishLanguage {
 
   async recordAudioAndSaveAsDraft() {
     await AudioManager.playAudio("spanish");
-    await driver.pause(180000);
+    await driver.pause(40000);
     const transcriptFile = await AudioManager.stopAudio();
     await verifyAndClick(this.Back);
     await verifyAndClick(this.saveAsDraftBtn);
-    return transcriptFile;
-  }
-  async recordAudioAndContinueForPrevEncounter() {
-    await this.recordAudioforOfflineMode();
-    await waitForElement(this.PrevEncounterRef);
-    await this.PrevEncounterRefNo.click();
   }
   async recordAudioForDraft() {
     await this.recordAudio();
@@ -1581,7 +1567,8 @@ class SpanishLanguage {
       await verifyAndClick(this.AddConversation);
       await verifyAndClick(this.AddConversationConfirmationYes);
     }
-    await this.recordAudio();
+    await this.multiple_Conversation();
+
     await this.PrevEncounterRef.click();
     await this.PrevEncounterRefNo.click();
   }
@@ -1601,18 +1588,47 @@ class SpanishLanguage {
     await verifyAndClick(this.AddConversationConfirmationYes);
     await this.recordAudio();
   }
-  async third_Conversations_For_New_Patient() {
+  async multiple_Conversation() {
     if (
       await this.resumeConversationForMultipleConverstionScenario.isDisplayed()
     ) {
-      allureReporter.addIssue("the previous encounter is saved as a dreaft ");
+      allureReporter.addIssue("The second conversation is saved as a draft");
       await this.resumeConversationForMultipleConverstionScenario.click();
       await this.resumeConversationForMultipleConverstionScenarioYes.click();
     } else if (await this.AddConversation.isDisplayed()) {
       await verifyAndClick(this.AddConversation);
       await verifyAndClick(this.AddConversationConfirmationYes);
     }
+    await verify(this.pauseBtn);
+    await this.recordAudioAndSaveAsDraft();
+    await driver.pause(3000);
+    await LoginPage.restartApp();
+    await waitForElement(HomePage.encounter);
+    await verifyAndClick(HomePage.encounter);
+    await driver.pause(3000);
+    await EncounterPage.clickDraftTranscript();
+    await waitForElement(this.finaliseEncounter);
+    await verifyAndClick(this.finaliseEncounter);
+    await driver.pause(3000);
+    await verifyAndClick(this.COK);
+    await verifyAndClick(this.resumeConversationForMultipleConverstionScenario);
+    await verifyAndClick(
+      this.resumeConversationForMultipleConverstionScenarioYes,
+    );
     await this.recordAudio();
+  }
+  async third_Conversations_For_New_Patient() {
+    if (
+      await this.resumeConversationForMultipleConverstionScenario.isDisplayed()
+    ) {
+      allureReporter.addIssue("the second conversation is saved as a dreaft ");
+      await this.resumeConversationForMultipleConverstionScenario.click();
+      await this.resumeConversationForMultipleConverstionScenarioYes.click();
+    } else if (await this.AddConversation.isDisplayed()) {
+      await verifyAndClick(this.AddConversation);
+      await verifyAndClick(this.AddConversationConfirmationYes);
+    }
+    await this.multiple_Conversation();
   }
 
   async third_Conversations_For_Existing_Patient() {
@@ -1727,13 +1743,13 @@ class SpanishLanguage {
     await verifyAndClick(this.title);
     await this.titleTextField.setValue("Grupo sanguíneo");
     await verifyAndClick(this.Discription);
-    await this.discriptionTextField.setValue("B postivo");
+    await this.discriptionTextField.setValue("B positivo");
     await verifyAndClick(this.add);
     await verifyAndClick(this.save);
     await waitForElement(this.COK);
     await verifyAndClick(this.COK);
     await this.bloodGroup("Grupo sanguíneo");
-    await this.bloodName("B postivo");
+    await this.bloodName("B positivo");
   }
 
   get SoapNoteScreenTxtFieldEntry() {
@@ -1753,7 +1769,7 @@ class SpanishLanguage {
     await waitForElement(this.COK);
     await verifyAndClick(this.COK);
     await this.bloodGroup("Grupo sanguíneo");
-    await this.bloodName("O postivo");
+    await this.bloodName("O positivo");
   }
   get MicStop() {
     return $("~micBackgroundImage");
@@ -1763,7 +1779,7 @@ class SpanishLanguage {
     await waitForElement(this.Mic);
     await verifyAndClick(this.Mic);
     await driver.pause(2000);
-    await playTTS("Grupo sanguíneo B negativo", "Juan", 1.0);
+    await playTTS("Grupo sanguíneo O Negativo", "Juan", 1.0);
     await driver.pause(2000);
     await verifyAndClick(this.MicStop);
     await verifyAndClick(this.send);
@@ -1771,7 +1787,7 @@ class SpanishLanguage {
     await validate(this.COK);
     await verifyAndClick(this.COK);
     await this.bloodGroup("Grupo sanguíneo");
-    await this.bloodName("B negitivo");
+    await this.bloodName("O negitivo");
   }
 }
 export default new SpanishLanguage();

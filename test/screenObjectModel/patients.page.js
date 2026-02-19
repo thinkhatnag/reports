@@ -1,5 +1,8 @@
 import searchPatientPage from "./searchPatient.page";
-import { verifyAndClick } from "/Users/nagasubarayudu/Desktop/IOS/helpers/helper.js";
+import {
+  verifyAndClick,
+  waitForElement,
+} from "/Users/nagasubarayudu/Desktop/IOS/helpers/helper.js";
 
 class PatientsPage {
   get patients() {
@@ -49,10 +52,40 @@ class PatientsPage {
     await this.patientSearch.click();
     await this.patientSearch.setValue(patientName);
   }
+  async patientElement(patientName) {
+    const name = await $(`~${patientName}`);
+
+    const singleCell = await $(
+      `-ios class chain:**/XCUIElementTypeTable/XCUIElementTypeCell[1]`,
+    );
+
+    const multiCell = await $(
+      `-ios class chain:**/XCUIElementTypeTable/XCUIElementTypeCell`,
+    );
+
+    if (await name.isDisplayed()) {
+      await name.click();
+    } else if (await singleCell.isDisplayed()) {
+      await singleCell.click();
+    } else if (await multiCell.isDisplayed()) {
+      await multiCell.click();
+    } else {
+      console.log("No visible patient element found");
+    }
+  }
   async patientSearchAndContinue(patientName) {
-    const patientElement =await this.Search(patientName);
+    await this.Search(patientName);
     await driver.pause(2000);
+    const patientElement = await searchPatientPage.patientName(patientName);
     await verifyAndClick(patientElement);
+  }
+
+  async encounterSelection() {
+    if (await this.firstEncounter.isDisplayed()) {
+      await this.firstEncounter.click();
+    } else {
+      await this.firstEncounterForExistingPatient.click();
+    }
   }
 }
 
