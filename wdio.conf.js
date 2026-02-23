@@ -109,7 +109,7 @@ export const config = {
     // "./test/spec/Spanish/Login_Es.spec.js",
     // "./test/spec/Spanish/Settings_ES.spec.js",
     // "./test/spec/Spanish/New_Patient_ES.spec.js",
-    "./test/spec/Spanish/Existing_Patient_ES.spec.js",
+    // "./test/spec/Spanish/Existing_Patient_ES.spec.js",
     // './test/spec/Test.spec.js',
   ],
   // Patterns to exclude.
@@ -444,7 +444,6 @@ export const config = {
     context,
     { error, result, duration, passed, retries },
   ) {
-    // DEBUG: Check if hook fires
     console.log("\n╔══════════════════════════════════════╗");
     console.log("║  afterTest HOOK FIRED!              ║");
     console.log("╚══════════════════════════════════════╝");
@@ -463,6 +462,31 @@ export const config = {
 
     const baseTestName = test.title.replace(/-Es|_Es| Es /gi, "").trim();
 
+    // ✅ Screenshot + Allure attachment on failure
+    if (!passed) {
+      try {
+        const screenshot = await browser.takeScreenshot();
+
+        const allureReporter = (await import("@wdio/allure-reporter")).default;
+
+        allureReporter.addAttachment(
+          "Screenshot on Failure",
+          Buffer.from(screenshot, "base64"),
+          "image/png",
+        );
+
+        // Optional: auto mark as issue if error exists
+        if (error) {
+          allureReporter.addIssue("AUTO-FAIL", error.message || "Test failed");
+        }
+
+        console.log("📸 Screenshot attached to Allure");
+      } catch (err) {
+        console.log("⚠️ Screenshot failed:", err.message);
+      }
+    }
+
+    // ✅ Store result
     global.testResults.push({
       name: test.title,
       baseTestName: baseTestName,
@@ -471,22 +495,12 @@ export const config = {
       duration: duration,
       error: error ? error.message : null,
       isSpanish: isSpanish,
-      afterTest: async function (test, context, { passed }) {
-        if (!passed) {
-          const screenshot = await browser.takeScreenshot();
-
-          allureReporter.addAttachment(
-            "Screenshot on Failure",
-            Buffer.from(screenshot, "base64"),
-            "image/png",
-          );
-        }
-      },
     });
 
     console.log("✓ Pushed. Total:", global.testResults.length);
     console.log("═══════════════════════════════════════\n");
   },
+
   /**    idevicesyslog
    * Hook that gets executed after the suite has ended
    * @param {object} suite suite details

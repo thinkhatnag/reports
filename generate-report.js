@@ -45,24 +45,6 @@ function extractSuite(raw) {
   return "Ungrouped";
 }
 
-function extractIssue(raw) {
-  if (Array.isArray(raw.links)) {
-    const lnk = raw.links.find((l) => l.type === "issue");
-    if (lnk)
-      return {
-        hasIssue: true,
-        issueUrl: lnk.url || null,
-        issueName: lnk.name || lnk.url || "Known Issue",
-      };
-  }
-  if (Array.isArray(raw.labels)) {
-    const lbl = raw.labels.find((l) => l.name === "issue");
-    if (lbl?.value)
-      return { hasIssue: true, issueUrl: null, issueName: lbl.value };
-  }
-  return { hasIssue: false, issueUrl: null, issueName: null };
-}
-
 // Merge retries
 const merged = new Map();
 for (const file of resultFiles) {
@@ -85,7 +67,7 @@ merged.forEach(({ raw }) => {
   const isSpanish = /\s*[-_]Es\s*$/i.test(name);
   const baseTestName = name.replace(/\s*[-_]Es\s*$/i, "").trim();
   const suite = extractSuite(raw);
-  const issue = extractIssue(raw);
+  
   testCases.push({
     name,
     baseTestName,
@@ -97,9 +79,6 @@ merged.forEach(({ raw }) => {
     err,
     isSpanish,
     status,
-    hasIssue: issue.hasIssue,
-    issueUrl: issue.issueUrl,
-    issueName: issue.issueName,
   });
 });
 
@@ -123,11 +102,14 @@ const suiteList = Object.entries(suiteMap).map(([name, tests]) => {
     failed = 0,
     skipped = 0;
   pairs.forEach(({ en, es }) => {
-    const r = en || es;
-    total++;
-    if (r?.passed) passed++;
-    else if (r?.failed) failed++;
-    else if (r?.skipped) skipped++;
+    [en, es].forEach((t) => {
+      if (t) {
+        total++;
+        if (t.passed) passed++;
+        else if (t.failed) failed++;
+        else if (t.skipped) skipped++;
+      }
+    });
   });
   return { name, pairs, stats: { total, passed, failed, skipped } };
 });
@@ -142,14 +124,13 @@ const gStats = {
 const reportDate = new Date().toLocaleString();
 const reportTS = new Date().toISOString();
 
-// Safely serialize — no template literal, write as JSON assigned to a var
 const dataJson = JSON.stringify({
   suites: suiteList,
   stats: gStats,
   meta: { platform: "iOS", reportDate, reportTS },
 });
 
-// ── Write CSS file separately to avoid any escaping issues ────────────────────
+// CSS - CLEANED (no Dashboard, no Not Run, no Known Issue, better error tooltip)
 const css = `
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -159,20 +140,15 @@ const css = `
   --pass:#16a34a;--pass-bg:rgba(22,163,74,.08);
   --fail:#dc2626;--fail-bg:rgba(220,38,38,.08);
   --skip:#d97706;--skip-bg:rgba(217,119,6,.08);
-  --nr:#64748b;--nr-bg:rgba(100,116,139,.08);
-  --issue:#d97706;--iss-bg:rgba(217,119,6,.12);
   --acc:#2563eb;
   --r:6px;--rl:10px;
   --mono:'Courier New',monospace;
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);padding:20px;min-height:100vh}
 .page{max-width:1300px;margin:0 auto}
-.hdr{padding:22px 26px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);margin-bottom:14px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.hdr{padding:22px 26px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);margin-bottom:14px}
 .hdr h1{font-size:19px;font-weight:700;letter-spacing:-.3px;font-family:var(--mono)}
-.hdr h1 span{color:var(--acc)}
 .hdr-meta{margin-top:5px;font-size:11px;color:var(--txm);font-family:var(--mono)}
-.back{font-size:11px;color:var(--txm);text-decoration:none;border:1px solid var(--bd);padding:5px 11px;border-radius:var(--r);transition:.15s}
-.back:hover{color:var(--tx);border-color:var(--bd2)}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
 .sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:15px 16px;position:relative;overflow:hidden}
 .sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--acc);border-radius:var(--rl) var(--rl) 0 0}
@@ -187,8 +163,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .lb.p{background:var(--pass-bg);color:var(--pass);border:1px solid var(--pass)}
 .lb.f{background:var(--fail-bg);color:var(--fail);border:1px solid var(--fail)}
 .lb.s{background:var(--skip-bg);color:var(--skip);border:1px solid var(--skip)}
-.lb.nr{background:var(--nr-bg);color:var(--nr);border:1px solid var(--nr)}
-.lb.iss{background:var(--iss-bg);color:var(--issue);border:1px solid var(--issue);font-weight:900;width:17px;height:17px;padding:0;border-radius:50%;font-size:11px}
 .toolbar{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:space-between}
 .fg,.eg{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
 .flbl{font-size:10px;color:var(--txm);font-family:var(--mono);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-right:2px}
@@ -198,8 +172,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .fbtn[data-f="passed"].on{background:var(--pass-bg);color:var(--pass);border-color:var(--pass)}
 .fbtn[data-f="failed"].on{background:var(--fail-bg);color:var(--fail);border-color:var(--fail)}
 .fbtn[data-f="skipped"].on{background:var(--skip-bg);color:var(--skip);border-color:var(--skip)}
-.fbtn[data-f="notrun"].on{background:var(--nr-bg);color:var(--nr);border-color:var(--nr)}
-.fbtn[data-f="issue"].on{background:var(--iss-bg);color:var(--issue);border-color:var(--issue)}
 .cbtn{padding:4px 11px;border-radius:var(--r);border:1px solid var(--bd);background:transparent;color:var(--txm);font-size:11px;font-family:var(--mono);cursor:pointer;transition:.15s}
 .cbtn:hover{border-color:var(--bd2);color:var(--tx);background:var(--sf2)}
 .sind{font-size:10px;font-family:var(--mono);color:var(--pass);opacity:0;margin-left:6px;transition:opacity .3s}
@@ -232,25 +204,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ttbl tbody tr.hide{display:none}
 .ttbl td{padding:10px 14px;vertical-align:middle}
 .tname{font-size:12px;color:var(--tx);font-weight:500;min-width:200px;max-width:370px;word-break:break-word;line-height:1.5}
-.iss-wrap{display:inline-block;position:relative;vertical-align:middle;margin-left:6px}
-.ib{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--iss-bg);border:1.5px solid var(--issue);color:var(--issue);font-size:10px;font-weight:900;cursor:pointer;flex-shrink:0;text-decoration:none;transition:background .15s}
-.ib:hover,.ib.open{background:rgba(245,192,67,.32)}
-.iss-drop{display:none;position:absolute;left:0;top:calc(100% + 5px);min-width:220px;max-width:340px;background:#ffffff;border:1px solid var(--issue);border-radius:6px;z-index:40;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.15)}
-.iss-drop.show{display:block}
-.iss-drop-hdr{display:flex;align-items:center;justify-content:space-between;padding:7px 10px 5px;border-bottom:1px solid rgba(245,192,67,.2)}
-.iss-drop-title{font-size:10px;font-weight:700;font-family:'Courier New',monospace;color:var(--issue);text-transform:uppercase;letter-spacing:.5px}
-.iss-drop-close{font-size:12px;color:var(--txm);cursor:pointer;line-height:1;padding:0 2px}
-.iss-drop-close:hover{color:var(--tx)}
-.iss-drop-body{padding:8px 10px}
-.iss-drop-text{font-size:11px;color:#422006;font-family:'Courier New',monospace;line-height:1.6;white-space:pre-wrap;word-break:break-word}
-.iss-drop-link{display:inline-block;margin-top:6px;font-size:10px;color:var(--acc);text-decoration:none;font-family:'Courier New',monospace}
-.iss-drop-link:hover{text-decoration:underline}
 .sb{display:inline-flex;align-items:center;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700;font-family:var(--mono);white-space:nowrap}
 .sb.passed{background:var(--pass-bg);color:var(--pass);border:1px solid rgba(31,209,122,.25)}
 .sb.failed{background:var(--fail-bg);color:var(--fail);border:1px solid rgba(240,80,110,.25);cursor:help;position:relative}
 .sb.skipped{background:var(--skip-bg);color:var(--skip);border:1px solid rgba(245,192,67,.25)}
-.sb.not-run{background:var(--nr-bg);color:var(--nr);border:1px solid rgba(62,77,122,.25)}
-.err-tip{display:none;position:absolute;left:0;top:calc(100% + 5px);min-width:220px;max-width:340px;background:#ffffff;color:#991b1b;border:1px solid rgba(220,38,38,.35);padding:7px 10px;border-radius:6px;font-size:10px;white-space:pre-wrap;word-break:break-word;z-index:30;font-weight:400;line-height:1.5;pointer-events:none;font-family:'Courier New',monospace;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.err-tip{display:none;position:absolute;left:0;top:calc(100% + 5px);min-width:220px;max-width:380px;background:#ffffff;color:#1a202c;border:1px solid #dc2626;padding:10px 12px;border-radius:6px;font-size:11px;white-space:pre-wrap;word-break:break-word;z-index:30;font-weight:400;line-height:1.6;pointer-events:none;font-family:var(--mono);box-shadow:0 6px 16px rgba(0,0,0,.15)}
 .sb.failed:hover .err-tip{display:block}
 .ci{width:100%;min-width:150px;padding:5px 9px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:11px;transition:.15s}
 .ci:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 2px rgba(79,127,255,.12)}
@@ -262,71 +220,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .footer{margin-top:28px;text-align:center;font-size:11px;font-family:var(--mono);color:var(--txd)}
 `;
 
-// ── Write the JS separately too — no escaping issues ─────────────────────────
+// JS - CLEANED (no Dashboard, no Not Run, no Known Issue)
 const js = `
 var D = ${dataJson};
 
 function sc(t){
-  if(!t)return'not-run';
+  if(!t)return'';
   if(t.skipped)return'skipped';
   if(t.passed)return'passed';
   if(t.failed)return'failed';
-  return'not-run';
-}
-function sl(t){
-  if(!t)return'N/R';
-  if(t.skipped)return'SKIP';
-  if(t.passed)return'PASS';
-  if(t.failed)return'FAIL';
-  return'N/R';
+  return'';
 }
 function slIcon(t){
-  if(!t)return'&mdash; N/R';
+  if(!t)return'';
   if(t.skipped)return'&#8855; SKIP';
   if(t.passed)return'&#10003; PASS';
   if(t.failed)return'&#10007; FAIL';
-  return'&mdash; N/R';
+  return'';
 }
-function issHtml(t,uid){
-  if(!t||!t.hasIssue)return'';
-  var text=(t.issueName||'Known Issue').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  var linkHtml=t.issueUrl
-    ? '<a class="iss-drop-link" href="'+t.issueUrl+'" target="_blank" rel="noopener">&#128279; Open in tracker</a>'
-    : '';
-  return(
-    '<span class="iss-wrap" id="issw-'+uid+'">'+
-      '<span class="ib" onclick="toggleIss(this,event)">!</span>'+
-      '<div class="iss-drop" id="issd-'+uid+'">'+
-        '<div class="iss-drop-hdr">'+
-          '<span class="iss-drop-title">&#9888; Known Issue</span>'+
-          '<span class="iss-drop-close" onclick="closeIss(this,event)">&times;</span>'+
-        '</div>'+
-        '<div class="iss-drop-body">'+
-          '<div class="iss-drop-text">'+text+'</div>'+
-          linkHtml+
-        '</div>'+
-      '</div>'+
-    '</span>'
-  );
-}
-function toggleIss(btn,e){
-  e.stopPropagation();
-  var drop=btn.nextElementSibling;
-  var isOpen=drop.classList.contains('show');
-  document.querySelectorAll('.iss-drop.show').forEach(function(d){d.classList.remove('show');});
-  document.querySelectorAll('.ib.open').forEach(function(b){b.classList.remove('open');});
-  if(!isOpen){drop.classList.add('show');btn.classList.add('open');}
-}
-function closeIss(closeBtn,e){
-  e.stopPropagation();
-  var drop=closeBtn.closest('.iss-drop');
-  drop.classList.remove('show');
-  drop.previousElementSibling.classList.remove('open');
-}
-document.addEventListener('click',function(){
-  document.querySelectorAll('.iss-drop.show').forEach(function(d){d.classList.remove('show');});
-  document.querySelectorAll('.ib.open').forEach(function(b){b.classList.remove('open');});
-});
 function errTip(t){
   if(!t||!t.failed||!t.err)return'';
   var safe=t.err.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -373,18 +284,19 @@ D.suites.forEach(function(suite,si){
     var base=pair.base, en=pair.en, es=pair.es;
     var key=rowIdx++;
     var enSC=sc(en), esSC=sc(es);
-    var anyIssue=(en&&en.hasIssue)||(es&&es.hasIssue);
 
     var tr=document.createElement('tr');
     tr.setAttribute('data-k',key);
     tr.setAttribute('data-en',enSC);
     tr.setAttribute('data-es',esSC);
-    tr.setAttribute('data-iss',anyIssue?'1':'0');
+
+    var enHTML = en ? '<span class="sb '+enSC+'">'+slIcon(en)+errTip(en)+'</span>' : '';
+    var esHTML = es ? '<span class="sb '+esSC+'">'+slIcon(es)+errTip(es)+'</span>' : '';
 
     tr.innerHTML=
-      '<td class="tname">'+base+(issHtml(en,'en'+key)||issHtml(es,'es'+key))+'</td>'+
-      '<td><span class="sb '+enSC+'">'+slIcon(en)+errTip(en)+'</span></td>'+
-      '<td><span class="sb '+esSC+'">'+slIcon(es)+errTip(es)+'</span></td>'+
+      '<td class="tname">'+base+'</td>'+
+      '<td>'+enHTML+'</td>'+
+      '<td>'+esHTML+'</td>'+
       '<td><input class="ci" type="text" data-k="'+key+'" placeholder="Add comment" oninput="saveC('+key+',this.value)"/></td>';
 
     tbody.appendChild(tr);
@@ -418,14 +330,12 @@ function setF(f){
   document.querySelectorAll('.sblock').forEach(function(block){
     var hits=0;
     block.querySelectorAll('tbody tr').forEach(function(row){
-      var enS=row.getAttribute('data-en'), esS=row.getAttribute('data-es'), iss=row.getAttribute('data-iss');
+      var enS=row.getAttribute('data-en'), esS=row.getAttribute('data-es');
       var show=
         f==='all'    ?true:
         f==='passed' ?(enS==='passed' ||esS==='passed'):
         f==='failed' ?(enS==='failed' ||esS==='failed'):
-        f==='skipped'?(enS==='skipped'||esS==='skipped'):
-        f==='notrun' ?(enS==='not-run'||esS==='not-run'):
-        f==='issue'  ?(iss==='1'):true;
+        f==='skipped'?(enS==='skipped'||esS==='skipped'):true;
       row.classList.toggle('hide',!show);
       if(show)hits++;
     });
@@ -453,14 +363,15 @@ function loadC(){
 }
 function exportCSV(){
   function esc(s){return'"'+String(s).replace(/"/g,'""')+'"';}
-  var rows=[['Suite','Test Case','Issue','English','Spanish','Comment']];
+  var rows=[['Suite','Test Case','English','Spanish','Comment']];
   var k=0;
   D.suites.forEach(function(suite){
     suite.pairs.forEach(function(pair){
       var en=pair.en,es=pair.es;
-      var iss=(en&&en.hasIssue)||(es&&es.hasIssue)?((en&&en.issueName)||(es&&es.issueName)||'yes'):'';
+      var enStat = en ? (en.skipped?'SKIP':en.passed?'PASS':'FAIL') : '';
+      var esStat = es ? (es.skipped?'SKIP':es.passed?'PASS':'FAIL') : '';
       var comment=localStorage.getItem('c_'+k)||'';
-      rows.push([suite.name,pair.base,iss,sl(en),sl(es),comment]);
+      rows.push([suite.name,pair.base,enStat,esStat,comment]);
       k++;
     });
   });
@@ -475,7 +386,7 @@ function exportCSV(){
 window.addEventListener('load',loadC);
 `;
 
-// ── Assemble HTML by concatenation — zero template literal escaping ───────────
+// HTML Assembly - NO DASHBOARD LINK
 const html = [
   "<!DOCTYPE html>",
   '<html lang="en">',
@@ -491,9 +402,8 @@ const html = [
   '<div class="page">',
 
   '<div class="hdr">',
-  "  <div><h1>&#128241; iOS Test Report <span>v2</span></h1>",
-  '  <div class="hdr-meta" id="hdrMeta">Loading&hellip;</div></div>',
-  '  <a href="index.html" class="back">&larr; Dashboard</a>',
+  '  <h1>&#128241; iOS Test Report</h1>',
+  '  <div class="hdr-meta" id="hdrMeta">Loading&hellip;</div>',
   "</div>",
 
   '<div class="stats">',
@@ -508,8 +418,6 @@ const html = [
   '  <div class="leg-item"><span class="lb p">&#10003; PASS</span> Test passed</div>',
   '  <div class="leg-item"><span class="lb f">&#10007; FAIL</span> Test failed</div>',
   '  <div class="leg-item"><span class="lb s">&#8855; SKIP</span> Skipped</div>',
-  '  <div class="leg-item"><span class="lb nr">&mdash; N/R</span> Not run</div>',
-  '  <div class="leg-item"><span class="lb iss">!</span> Known issue &mdash; click to see full issue text</div>',
   "</div>",
 
   '<div class="toolbar">',
@@ -519,8 +427,6 @@ const html = [
   '    <button class="fbtn"    data-f="passed"  onclick="setF(\'passed\')">&#10003; Pass</button>',
   '    <button class="fbtn"    data-f="failed"  onclick="setF(\'failed\')">&#10007; Fail</button>',
   '    <button class="fbtn"    data-f="skipped" onclick="setF(\'skipped\')">&#8855; Skip</button>',
-  '    <button class="fbtn"    data-f="notrun"  onclick="setF(\'notrun\')">&mdash; Not Run</button>',
-  '    <button class="fbtn"    data-f="issue"   onclick="setF(\'issue\')">! Issues</button>',
   "  </div>",
   '  <div class="eg">',
   '    <button class="cbtn" onclick="expandAll()">Expand All</button>',
@@ -547,9 +453,9 @@ const html = [
 ].join("\n");
 
 fs.writeFileSync(OUT_FILE, html);
-console.log("Report written to:", OUT_FILE);
+console.log("✅ Report written to:", OUT_FILE);
 console.log(
-  "Suites:",
+  "📊 Stats | Suites:",
   suiteList.length,
   "| Total:",
   gStats.total,
@@ -560,81 +466,3 @@ console.log(
   "| Skip:",
   gStats.skipped,
 );
-
-// ── Generate index.html dashboard ────────────────────────────────────────────
-const indexHtml = [
-  "<!DOCTYPE html>",
-  '<html lang="en">',
-  "<head>",
-  '<meta charset="UTF-8"/>',
-  '<meta name="viewport" content="width=device-width,initial-scale=1.0"/>',
-  "<title>Test Reports Dashboard</title>",
-  "<style>",
-  "*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}",
-  'body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f8f9fb;color:#1a202c;padding:40px 20px;min-height:100vh}',
-  ".page{max-width:900px;margin:0 auto}",
-  ".hdr{text-align:center;margin-bottom:40px}",
-  '.hdr h1{font-size:32px;font-weight:700;font-family:"Courier New",monospace;margin-bottom:10px;color:#1a202c}',
-  '.hdr p{font-size:14px;color:#4a5568;font-family:"Courier New",monospace}',
-  ".reports{display:grid;gap:16px}",
-  ".card{background:#ffffff;border:1px solid #d4d9e1;border-radius:10px;padding:24px 28px;transition:all .2s;cursor:pointer;text-decoration:none;display:block}",
-  ".card:hover{border-color:#b0b8c8;background:#f4f6f8;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}",
-  ".card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}",
-  '.card-title{font-size:18px;font-weight:600;color:#1a202c;font-family:"Courier New",monospace}',
-  ".card-icon{font-size:24px;color:#4a5568}",
-  '.card-meta{font-size:12px;color:#4a5568;font-family:"Courier New",monospace;margin-bottom:14px}',
-  ".card-stats{display:flex;gap:14px;flex-wrap:wrap}",
-  '.stat{display:flex;align-items:center;gap:6px;font-size:13px;font-family:"Courier New",monospace}',
-  ".stat-dot{width:8px;height:8px;border-radius:50%}",
-  ".stat.total .stat-dot{background:#2563eb}",
-  ".stat.pass .stat-dot{background:#16a34a}",
-  ".stat.fail .stat-dot{background:#dc2626}",
-  ".stat.skip .stat-dot{background:#d97706}",
-  ".stat-val{font-weight:700}",
-  ".stat.total{color:#4a5568}",
-  ".stat.pass{color:#16a34a}",
-  ".stat.fail{color:#dc2626}",
-  ".stat.skip{color:#d97706}",
-  '.footer{margin-top:60px;text-align:center;font-size:12px;color:#a0aec0;font-family:"Courier New",monospace}',
-  "</style>",
-  "</head>",
-  "<body>",
-  '<div class="page">',
-  '<div class="hdr">',
-  "  <h1>📊 Test Reports Dashboard</h1>",
-  "  <p>iOS Mobile Testing — WebdriverIO + Appium + Allure</p>",
-  "</div>",
-  '<div class="reports">',
-  '  <a href="test-report-v2.html" class="card">',
-  '    <div class="card-top">',
-  '      <div class="card-title">📱 Latest Test Run</div>',
-  '      <div class="card-icon">→</div>',
-  "    </div>",
-  '    <div class="card-meta">Generated: ' + reportDate + "</div>",
-  '    <div class="card-stats">',
-  '      <div class="stat total"><span class="stat-dot"></span><span class="stat-val">' +
-    gStats.total +
-    "</span> total</div>",
-  '      <div class="stat pass"><span class="stat-dot"></span><span class="stat-val">' +
-    gStats.passed +
-    "</span> passed</div>",
-  '      <div class="stat fail"><span class="stat-dot"></span><span class="stat-val">' +
-    gStats.failed +
-    "</span> failed</div>",
-  '      <div class="stat skip"><span class="stat-dot"></span><span class="stat-val">' +
-    gStats.skipped +
-    "</span> skipped</div>",
-  "    </div>",
-  "  </a>",
-  "</div>",
-  '<div class="footer">',
-  "  Automated Test Reporting • v2.0",
-  "</div>",
-  "</div>",
-  "</body>",
-  "</html>",
-].join("\n");
-
-const INDEX_FILE = path.join(OUT_DIR, "index.html");
-fs.writeFileSync(INDEX_FILE, indexHtml);
-console.log("Index written to:", INDEX_FILE);
