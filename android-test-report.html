@@ -6,106 +6,342 @@
 <title>Android Test Report</title>
 <style>
 
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#f8f9fb;--sf:#ffffff;--sf2:#f4f6f8;--sf3:#e8ebf0;
-  --bd:#d4d9e1;--bd2:#b0b8c8;
-  --tx:#1a202c;--txm:#4a5568;--txd:#cbd5e0;
-  --pass:#16a34a;--pass-bg:rgba(22,163,74,.08);
-  --fail:#dc2626;--fail-bg:rgba(220,38,38,.08);
-  --skip:#d97706;--skip-bg:rgba(217,119,6,.08);
-  --acc:#3dba6f;
-  --r:6px;--rl:10px;
-  --mono:'Courier New',monospace;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #0a0c10;
+  --sf:      #111318;
+  --sf2:     #181c24;
+  --sf3:     #1e2330;
+  --bd:      #252b38;
+  --bd2:     #2e3748;
+  --tx:      #e8ecf4;
+  --txm:     #8892a4;
+  --txd:     #3d4759;
+  --pass:    #34d17a;
+  --fail:    #f04f6e;
+  --skip:    #f5c843;
+  --ios:     #4f9eff;
+  --ios-dim:  rgba(79,158,255,.12);
+  --ios-glow: rgba(79,158,255,.25);
+  --and:     #34d17a;
+  --and-dim:  rgba(52,209,122,.10);
+  --and-glow: rgba(52,209,122,.22);
+  --mono:    'Space Mono', monospace;
+  --display: 'Syne', sans-serif;
 }
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);padding:20px;min-height:100vh}
-.page{max-width:1300px;margin:0 auto}
-.hdr{padding:22px 26px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);margin-bottom:14px;display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
-.hdr h1{font-size:19px;font-weight:700;letter-spacing:-.3px;font-family:var(--mono)}
-.hdr h1 span{color:var(--acc)}
-.hdr-meta{margin-top:5px;font-size:11px;color:var(--txm);font-family:var(--mono)}
-.back{font-size:11px;color:var(--txm);text-decoration:none;border:1px solid var(--bd);padding:5px 11px;border-radius:var(--r);transition:.15s;white-space:nowrap}
-.back:hover{color:var(--tx);border-color:var(--bd2)}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
-.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:15px 16px;position:relative;overflow:hidden}
-.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--acc);border-radius:var(--rl) var(--rl) 0 0}
-.sc.p::before{background:var(--pass)}.sc.f::before{background:var(--fail)}.sc.s::before{background:var(--skip)}
-.sc-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--txm);margin-bottom:6px;font-family:var(--mono)}
-.sc-val{font-size:32px;font-weight:700;font-family:var(--mono);line-height:1}
-.sc.p .sc-val{color:var(--pass)}.sc.f .sc-val{color:var(--fail)}.sc.s .sc-val{color:var(--skip)}
-.legend{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:10px 16px;margin-bottom:10px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-.leg-ttl{font-size:10px;font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--txm);margin-right:4px}
-.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--txm)}
-.lb{display:inline-flex;align-items:center;justify-content:center;padding:2px 8px;border-radius:100px;font-size:10px;font-weight:700;font-family:var(--mono)}
-.lb.p{background:var(--pass-bg);color:var(--pass);border:1px solid var(--pass)}
-.lb.f{background:var(--fail-bg);color:var(--fail);border:1px solid var(--fail)}
-.lb.s{background:var(--skip-bg);color:var(--skip);border:1px solid var(--skip)}
-.toolbar{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:space-between}
-.fg,.eg{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
-.flbl{font-size:10px;color:var(--txm);font-family:var(--mono);font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-right:2px}
-.fbtn{padding:4px 11px;border-radius:100px;border:1px solid var(--bd);background:transparent;color:var(--txm);font-size:11px;font-family:var(--mono);font-weight:700;cursor:pointer;transition:.15s}
-.fbtn:hover{border-color:var(--bd2);color:var(--tx)}
-.fbtn.on{background:var(--sf3);color:var(--tx);border-color:var(--bd2)}
-.fbtn[data-f="passed"].on{background:var(--pass-bg);color:var(--pass);border-color:var(--pass)}
-.fbtn[data-f="failed"].on{background:var(--fail-bg);color:var(--fail);border-color:var(--fail)}
-.fbtn[data-f="skipped"].on{background:var(--skip-bg);color:var(--skip);border-color:var(--skip)}
-.cbtn{padding:4px 11px;border-radius:var(--r);border:1px solid var(--bd);background:transparent;color:var(--txm);font-size:11px;font-family:var(--mono);cursor:pointer;transition:.15s}
-.cbtn:hover{border-color:var(--bd2);color:var(--tx);background:var(--sf2)}
-.sind{font-size:10px;font-family:var(--mono);color:var(--pass);opacity:0;margin-left:6px;transition:opacity .3s}
-.sind.show{opacity:1}
-.suites{display:flex;flex-direction:column;gap:7px}
-.sblock{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);overflow:hidden;transition:border-color .15s}
-.sblock:hover{border-color:var(--bd2)}
-.sblock.gone{display:none}
-.shdr{display:flex;align-items:center;gap:11px;padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s;flex-wrap:wrap}
-.shdr:hover{background:var(--sf2)}
-.chev{width:16px;height:16px;flex-shrink:0;color:var(--txm);transition:transform .2s;display:flex;align-items:center;justify-content:center}
-.sblock.open .chev{transform:rotate(90deg)}
-.sname{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--tx);flex:1;min-width:0;word-break:break-word}
-.suite-order{font-size:10px;font-family:var(--mono);color:var(--txm);background:var(--sf3);border:1px solid var(--bd);border-radius:4px;padding:2px 7px;flex-shrink:0}
-.pills-c,.pills-e{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
-.sblock.open .pills-c{display:none}
-.pills-e{display:none}
-.sblock.open .pills-e{display:flex}
-.pill{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:100px;font-size:10px;font-weight:700;font-family:var(--mono)}
-.pill.t{background:var(--sf3);color:var(--txm);border:1px solid var(--bd)}
-.pill.p{background:var(--pass-bg);color:var(--pass);border:1px solid rgba(31,209,122,.2)}
-.pill.f{background:var(--fail-bg);color:var(--fail);border:1px solid rgba(240,80,110,.2)}
-.pill.s{background:var(--skip-bg);color:var(--skip);border:1px solid rgba(245,192,67,.2)}
-.sbody{display:none;border-top:1px solid var(--bd)}
-.sblock.open .sbody{display:block}
-.ttbl{width:100%;border-collapse:collapse}
-.ttbl thead th{padding:8px 14px;text-align:left;font-size:10px;font-weight:700;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;color:var(--txm);background:var(--sf2);border-bottom:1px solid var(--bd)}
-.ttbl thead th.seq-col{width:36px;text-align:center}
-.ttbl tbody tr{border-bottom:1px solid var(--bd);transition:background .1s}
-.ttbl tbody tr:last-child{border-bottom:none}
-.ttbl tbody tr:hover{background:var(--sf2)}
-.ttbl tbody tr.hide{display:none}
-.ttbl td{padding:10px 14px;vertical-align:middle}
-.seq-num{width:36px;text-align:center;font-size:10px;font-family:var(--mono);color:var(--txm);font-weight:700}
-.tname{font-size:12px;color:var(--tx);font-weight:500;min-width:200px;max-width:370px;word-break:break-word;line-height:1.5}
-.sb{display:inline-flex;align-items:center;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:700;font-family:var(--mono);white-space:nowrap}
-.sb.passed{background:var(--pass-bg);color:var(--pass);border:1px solid rgba(31,209,122,.25)}
-.sb.failed{background:var(--fail-bg);color:var(--fail);border:1px solid rgba(240,80,110,.25);cursor:help;position:relative}
-.sb.skipped{background:var(--skip-bg);color:var(--skip);border:1px solid rgba(245,192,67,.25)}
-.err-tip{display:none;position:absolute;left:0;top:calc(100% + 5px);min-width:220px;max-width:380px;background:#ffffff;color:#1a202c;border:1px solid #dc2626;padding:10px 12px;border-radius:6px;font-size:11px;white-space:pre-wrap;word-break:break-word;z-index:30;font-weight:400;line-height:1.6;pointer-events:none;font-family:var(--mono);box-shadow:0 6px 16px rgba(0,0,0,.15)}
-.sb.failed:hover .err-tip{display:block}
-.ci{width:100%;min-width:150px;padding:5px 9px;background:var(--sf2);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-size:11px;transition:.15s}
-.ci:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 2px rgba(61,186,111,.12)}
-.nores{text-align:center;padding:40px;color:var(--txm);font-family:var(--mono);font-size:12px;display:none}
-.nores.show{display:block}
-.exp-row{margin-top:12px;display:flex;gap:10px;align-items:center}
-.exp-btn{padding:7px 18px;background:var(--acc);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;font-family:var(--mono);cursor:pointer;transition:opacity .15s}
-.exp-btn:hover{opacity:.85}
-.footer{margin-top:28px;text-align:center;font-size:11px;font-family:var(--mono);color:var(--txd)}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--mono);
+  background: var(--bg);
+  color: var(--tx);
+  min-height: 100vh;
+  background-image:
+    linear-gradient(rgba(79,158,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79,158,255,.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.page {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+.hdr {
+  margin-bottom: 48px;
+  position: relative;
+}
+
+.hdr h1 {
+  font-family: var(--display);
+  font-size: clamp(32px, 6vw, 56px);
+  font-weight: 800;
+  letter-spacing: -1.2px;
+  line-height: 1.05;
+  color: var(--tx);
+}
+
+.hdr h1 em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--ios) 0%, var(--and) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hdr-meta {
+  font-size: 13px;
+  color: var(--txm);
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+}
+
+/* Stats cards - similar hover/glow as dashboard */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.sc {
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  padding: 20px 24px;
+  position: relative;
+  overflow: hidden;
+  transition: transform .25s cubic-bezier(.16,1,.3,1), border .25s, box-shadow .25s;
+}
+
+.sc:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 0 1px var(--ios-glow), 0 16px 48px rgba(0,0,0,.35);
+  border-color: var(--ios);
+}
+
+.sc::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 10% 40%, var(--ios-dim) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity .35s;
+  pointer-events: none;
+}
+
+.sc:hover::before { opacity: 1; }
+
+.sc-lbl {
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--txd);
+  margin-bottom: 8px;
+}
+
+.sc-val {
+  font-family: var(--display);
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.sc.total .sc-val { color: var(--tx); }
+.sc.p     .sc-val { color: var(--pass); }
+.sc.f     .sc-val { color: var(--fail); }
+.sc.s     .sc-val { color: var(--skip); }
+
+/* Legend, toolbar, buttons, suites, table, etc. */
+.legend {
+  background: var(--sf2);
+  border: 1px solid var(--bd);
+  border-radius: 14px;
+  padding: 12px 18px;
+  margin-bottom: 24px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--txm);
+}
+
+.leg-ttl { font-weight: 700; letter-spacing: 0.8px; }
+
+.lb {
+  min-width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.lb.p { background: var(--pass); color: #000; }
+.lb.f { background: var(--fail); color: #fff; }
+.lb.s { background: var(--skip); color: #000; }
+
+.toolbar {
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: 14px;
+  padding: 12px 18px;
+  margin-bottom: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.fg, .eg { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.fbtn {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--bd);
+  background: transparent;
+  color: var(--txm);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.fbtn:hover { border-color: var(--bd2); color: var(--tx); background: var(--sf2); }
+
+.fbtn.on { background: var(--sf3); color: var(--tx); border-color: var(--bd2); }
+
+.fbtn[data-f="passed"].on  { background: var(--and-dim); border-color: var(--pass); color: var(--pass); }
+.fbtn[data-f="failed"].on  { background: rgba(240,79,110,.09); border-color: var(--fail); color: var(--fail); }
+.fbtn[data-f="skipped"].on { background: rgba(245,200,67,.07); border-color: var(--skip); color: var(--skip); }
+
+/* ... continue with .sind, .suites, .sblock, .pill, table, .sb, .err-tip, .ci, .exp-btn, .footer ... */
+
+.suites { display: flex; flex-direction: column; gap: 10px; }
+
+.sblock {
+  background: var(--sf);
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.shdr {
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  transition: background .2s;
+}
+
+.shdr:hover { background: var(--sf2); }
+
+.sname {
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  flex: 1;
+}
+
+.pill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 700;
+  font-family: var(--mono);
+}
+
+.pill.t { background: var(--sf2); color: var(--txm); border: 1px solid var(--bd); }
+.pill.p { background: var(--and-dim); color: var(--pass); border: 1px solid rgba(52,209,122,.3); }
+.pill.f { background: rgba(240,79,110,.1); color: var(--fail); border: 1px solid rgba(240,79,110,.3); }
+.pill.s { background: rgba(245,200,67,.08); color: var(--skip); border: 1px solid rgba(245,200,67,.3); }
+
+.sbody { display: none; border-top: 1px solid var(--bd); }
+.sblock.open .sbody { display: block; }
+
+.ttbl { width: 100%; border-collapse: collapse; }
+.ttbl th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--txd);
+  background: var(--sf2);
+  border-bottom: 1px solid var(--bd);
+}
+.ttbl td { padding: 12px 16px; }
+.ttbl tr:hover { background: var(--sf3); }
+.ttbl tr.hide { display: none; }
+
+.tname { font-size: 13px; min-width: 240px; max-width: 440px; word-break: break-word; }
+
+.sb {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sb.passed  { background: var(--and-dim); color: var(--pass); border: 1px solid rgba(52,209,122,.35); }
+.sb.failed  { background: rgba(240,79,110,.12); color: var(--fail); border: 1px solid rgba(240,79,110,.35); position: relative; cursor: help; }
+.sb.skipped { background: rgba(245,200,67,.1); color: var(--skip); border: 1px solid rgba(245,200,67,.35); }
+
+.err-tip {
+  display: none;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: calc(100% + 10px);
+  min-width: 260px;
+  max-width: 480px;
+  background: #1a0f14;
+  color: #ffccd5;
+  border: 1px solid var(--fail);
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 12px;
+  white-space: pre-wrap;
+  z-index: 20;
+  box-shadow: 0 8px 24px rgba(0,0,0,.55);
+  font-family: var(--mono);
+}
+
+.sb.failed:hover .err-tip { display: block; }
+
+.ci {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--sf2);
+  border: 1px solid var(--bd);
+  border-radius: 8px;
+  color: var(--tx);
+  font-size: 12px;
+  font-family: var(--mono);
+}
+
+.ci:focus {
+  outline: none;
+  border-color: var(--ios);
+  box-shadow: 0 0 0 3px var(--ios-glow);
+}
+
+.exp-btn {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--ios), var(--and));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--display);
+  cursor: pointer;
+}
+
+.footer {
+  margin-top: 60px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--txd);
+}
 
 </style>
 </head>
 <body>
 <div class="page">
 <div class="hdr">
-  <div>  <h1>&#129302; Android Test Report </h1>
-
+  <div>
+  <h1>&#129302; Android Test Report <span>v2</span></h1>
   <div class="hdr-meta" id="hdrMeta">Loading&hellip;</div>
   </div>
   <a href="index.html" class="back">&larr; Dashboard</a>
@@ -145,7 +381,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 <script>
 
-var D = {"suites":[{"name":"Login","pairs":[{"base":"Login Error message verification: \"short Password\"","en":{"name":"Login Error message verification: \"short Password\"","baseTestName":"Login Error message verification: \"short Password\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":17057,"err":null,"isSpanish":false,"status":"passed"},"es":null},{"base":"Login Error message verification: \"short password\"","en":null,"es":{"name":"Login Error message verification: \"short password\" -Es","baseTestName":"Login Error message verification: \"short password\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":16011,"err":null,"isSpanish":true,"status":"passed"}},{"base":"Login Error messge verification: \"Email is not provided\"","en":{"name":"Login Error messge verification: \"Email is not provided\"","baseTestName":"Login Error messge verification: \"Email is not provided\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":8840,"err":null,"isSpanish":false,"status":"passed"},"es":null},{"base":"Login Error message verification: \"password not provided\"","en":null,"es":{"name":"Login Error message verification: \"password not provided\" -Es ","baseTestName":"Login Error message verification: \"password not provided\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":14204,"err":null,"isSpanish":true,"status":"passed"}},{"base":"Login Error message verification: \"invalid Email\"","en":{"name":"Login Error message verification: \"invalid Email\"","baseTestName":"Login Error message verification: \"invalid Email\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":9080,"err":null,"isSpanish":false,"status":"passed"},"es":null}],"stats":{"total":5,"passed":5,"failed":0,"skipped":0}},{"name":"Existing Patient","pairs":[{"base":"Finalize encounter","en":{"name":"Finalize encounter","baseTestName":"Finalize encounter","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":6603,"err":null,"isSpanish":false,"status":"passed"},"es":null},{"base":"Transcript Verification for the Draft Conversation","en":{"name":"Transcript Verification for the Draft Conversation","baseTestName":"Transcript Verification for the Draft Conversation","suite":"Existing Patient","passed":false,"skipped":false,"failed":true,"dur":10075,"err":"element (\"~Transcript\") still not displayed after 10000ms","isSpanish":false,"status":"broken"},"es":{"name":"Transcript Verification for the Draft Conversation -Es","baseTestName":"Transcript Verification for the Draft Conversation","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":18384,"err":null,"isSpanish":true,"status":"passed"}},{"base":"Trascript verification","en":null,"es":{"name":"Trascript verification -Es","baseTestName":"Trascript verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":18319,"err":null,"isSpanish":true,"status":"passed"}},{"base":"Patient info manual update","en":null,"es":{"name":"Patient info manual update -Es","baseTestName":"Patient info manual update","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":23186,"err":null,"isSpanish":true,"status":"passed"}},{"base":"Offline Mode Stop and App Kill Verification","en":null,"es":{"name":"Offline Mode Stop and App Kill Verification -Es","baseTestName":"Offline Mode Stop and App Kill Verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":81919,"err":null,"isSpanish":true,"status":"passed"}},{"base":"Transcript Verification for the Second Conversation","en":{"name":"Transcript Verification for the Second Conversation","baseTestName":"Transcript Verification for the Second Conversation","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":14788,"err":null,"isSpanish":false,"status":"passed"},"es":null},{"base":"Hay Noki verification","en":null,"es":{"name":"Hay Noki verification -Es","baseTestName":"Hay Noki verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":76148,"err":null,"isSpanish":true,"status":"passed"}},{"base":"App Killed in Offline and Reopened in Online Mode Verification","en":{"name":"App Killed in Offline and Reopened in Online Mode Verification","baseTestName":"App Killed in Offline and Reopened in Online Mode Verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":57922,"err":null,"isSpanish":false,"status":"passed"},"es":null},{"base":"SoapNote Regeneration","en":{"name":"SoapNote Regeneration","baseTestName":"SoapNote Regeneration","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":67880,"err":null,"isSpanish":false,"status":"passed"},"es":null}],"stats":{"total":10,"passed":9,"failed":1,"skipped":0}},{"name":"Forgot Password","pairs":[{"base":"Verify Reset Password mail generation","en":null,"es":{"name":"Verify Reset Password mail generation -Es","baseTestName":"Verify Reset Password mail generation","suite":"Forgot Password","passed":false,"skipped":false,"failed":true,"dur":21074,"err":"element (\"~El enlace para restablecer la contraseña ha sido enviado correctamente a su correo electrónico.\") still not displayed after 10000ms","isSpanish":true,"status":"broken"}},{"base":"Error message verifcation: \"Email not Enterd\"","en":{"name":"Error message verifcation: \"Email not Enterd\"","baseTestName":"Error message verifcation: \"Email not Enterd\"","suite":"Forgot Password","passed":true,"skipped":false,"failed":false,"dur":10356,"err":null,"isSpanish":false,"status":"passed"},"es":null},{"base":"Error message verification: \"Email is not rigisterd\"","en":{"name":"Error message verification: \"Email is not rigisterd\"","baseTestName":"Error message verification: \"Email is not rigisterd\"","suite":"Forgot Password","passed":true,"skipped":false,"failed":false,"dur":12238,"err":null,"isSpanish":false,"status":"passed"},"es":null}],"stats":{"total":3,"passed":2,"failed":1,"skipped":0}},{"name":"New Patient","pairs":[{"base":"Referal Generation and Regeneration","en":null,"es":{"name":"Referal Generation and Regeneration-Es","baseTestName":"Referal Generation and Regeneration","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":53849,"err":null,"isSpanish":true,"status":"passed"}},{"base":"Transcript Verification for the Second Conversation for the First Encounter","en":null,"es":{"name":"Transcript Verification for the Second Conversation for the First Encounter -Es","baseTestName":"Transcript Verification for the Second Conversation for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":42838,"err":null,"isSpanish":true,"status":"passed"}},{"base":"SOAP Note Generation for the First Encounter","en":{"name":"SOAP Note Generation for the First Encounter","baseTestName":"SOAP Note Generation for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":195910,"err":null,"isSpanish":false,"status":"passed"},"es":null},{"base":"Care plan Generation and Regeneration","en":null,"es":{"name":"Care plan Generation and Regeneration-Es","baseTestName":"Care plan Generation and Regeneration","suite":"New Patient","passed":false,"skipped":false,"failed":true,"dur":140244,"err":"element (\"~Descargar\") still not displayed after 10000ms","isSpanish":true,"status":"broken"}},{"base":"SoapNote Regeneration","en":null,"es":{"name":"SoapNote Regeneration-Es","baseTestName":"SoapNote Regeneration","suite":"New Patient","passed":false,"skipped":false,"failed":true,"dur":11798,"err":"element (\"~Regenerar nota SOAP\") still not displayed after 10000ms","isSpanish":true,"status":"broken"}},{"base":"Transcript verification for the Second Conversation in First Encounter","en":{"name":"Transcript verification for the Second Conversation in First Encounter","baseTestName":"Transcript verification for the Second Conversation in First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":11749,"err":null,"isSpanish":false,"status":"passed"},"es":null}],"stats":{"total":6,"passed":4,"failed":2,"skipped":0}},{"name":"Setting","pairs":[{"base":"Verify Setting's screen launguage and general settings","en":{"name":"Verify Setting's screen launguage and general settings","baseTestName":"Verify Setting's screen launguage and general settings","suite":"Setting","passed":true,"skipped":false,"failed":false,"dur":16783,"err":null,"isSpanish":false,"status":"passed"},"es":null}],"stats":{"total":1,"passed":1,"failed":0,"skipped":0}}],"stats":{"total":25,"passed":21,"failed":4,"skipped":0},"meta":{"platform":"Android","reportDate":"2/23/2026, 12:06:03 PM","reportTS":"2026-02-23T06:36:03.357Z"}};
+var D = {"suites":[{"name":"Login","pairs":[{"base":"Login Error message verification: \"short Password\"","en":{"name":"Login Error message verification: \"short Password\"","baseTestName":"Login Error message verification: \"short Password\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":17057,"err":null,"isSpanish":false,"status":"passed"},"es":null},{"base":"Login Error message verification: \"short password\"","en":null,"es":{"name":"Login Error message verification: \"short password\" -Es","baseTestName":"Login Error message verification: \"short password\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":16011,"err":null,"isSpanish":true,"status":"passed"}},{"base":"Login Error messge verification: \"Email is not provided\"","en":{"name":"Login Error messge verification: \"Email is not provided\"","baseTestName":"Login Error messge verification: \"Email is not provided\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":8840,"err":null,"isSpanish":false,"status":"passed"},"es":null},{"base":"Login Error message verification: \"password not provided\"","en":null,"es":{"name":"Login Error message verification: \"password not provided\" -Es ","baseTestName":"Login Error message verification: \"password not provided\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":14204,"err":null,"isSpanish":true,"status":"passed"}},{"base":"Login Error message verification: \"invalid Email\"","en":{"name":"Login Error message verification: \"invalid Email\"","baseTestName":"Login Error message verification: \"invalid Email\"","suite":"Login","passed":true,"skipped":false,"failed":false,"dur":9080,"err":null,"isSpanish":false,"status":"passed"},"es":null}],"stats":{"total":5,"passed":5,"failed":0,"skipped":0}},{"name":"Existing Patient","pairs":[{"base":"Finalize encounter","en":{"name":"Finalize encounter","baseTestName":"Finalize encounter","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":6603,"err":null,"isSpanish":false,"status":"passed"},"es":null},{"base":"Transcript Verification for the Draft Conversation","en":{"name":"Transcript Verification for the Draft Conversation","baseTestName":"Transcript Verification for the Draft Conversation","suite":"Existing Patient","passed":false,"skipped":false,"failed":true,"dur":10075,"err":"element (\"~Transcript\") still not displayed after 10000ms","isSpanish":false,"status":"broken"},"es":{"name":"Transcript Verification for the Draft Conversation -Es","baseTestName":"Transcript Verification for the Draft Conversation","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":18384,"err":null,"isSpanish":true,"status":"passed"}},{"base":"Trascript verification","en":null,"es":{"name":"Trascript verification -Es","baseTestName":"Trascript verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":18319,"err":null,"isSpanish":true,"status":"passed"}},{"base":"Patient info manual update","en":null,"es":{"name":"Patient info manual update -Es","baseTestName":"Patient info manual update","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":23186,"err":null,"isSpanish":true,"status":"passed"}},{"base":"Offline Mode Stop and App Kill Verification","en":null,"es":{"name":"Offline Mode Stop and App Kill Verification -Es","baseTestName":"Offline Mode Stop and App Kill Verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":81919,"err":null,"isSpanish":true,"status":"passed"}},{"base":"Transcript Verification for the Second Conversation","en":{"name":"Transcript Verification for the Second Conversation","baseTestName":"Transcript Verification for the Second Conversation","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":14788,"err":null,"isSpanish":false,"status":"passed"},"es":null},{"base":"Hay Noki verification","en":null,"es":{"name":"Hay Noki verification -Es","baseTestName":"Hay Noki verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":76148,"err":null,"isSpanish":true,"status":"passed"}},{"base":"App Killed in Offline and Reopened in Online Mode Verification","en":{"name":"App Killed in Offline and Reopened in Online Mode Verification","baseTestName":"App Killed in Offline and Reopened in Online Mode Verification","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":57922,"err":null,"isSpanish":false,"status":"passed"},"es":null},{"base":"SoapNote Regeneration","en":{"name":"SoapNote Regeneration","baseTestName":"SoapNote Regeneration","suite":"Existing Patient","passed":true,"skipped":false,"failed":false,"dur":67880,"err":null,"isSpanish":false,"status":"passed"},"es":null}],"stats":{"total":10,"passed":9,"failed":1,"skipped":0}},{"name":"Forgot Password","pairs":[{"base":"Verify Reset Password mail generation","en":null,"es":{"name":"Verify Reset Password mail generation -Es","baseTestName":"Verify Reset Password mail generation","suite":"Forgot Password","passed":false,"skipped":false,"failed":true,"dur":21074,"err":"element (\"~El enlace para restablecer la contraseña ha sido enviado correctamente a su correo electrónico.\") still not displayed after 10000ms","isSpanish":true,"status":"broken"}},{"base":"Error message verifcation: \"Email not Enterd\"","en":{"name":"Error message verifcation: \"Email not Enterd\"","baseTestName":"Error message verifcation: \"Email not Enterd\"","suite":"Forgot Password","passed":true,"skipped":false,"failed":false,"dur":10356,"err":null,"isSpanish":false,"status":"passed"},"es":null},{"base":"Error message verification: \"Email is not rigisterd\"","en":{"name":"Error message verification: \"Email is not rigisterd\"","baseTestName":"Error message verification: \"Email is not rigisterd\"","suite":"Forgot Password","passed":true,"skipped":false,"failed":false,"dur":12238,"err":null,"isSpanish":false,"status":"passed"},"es":null}],"stats":{"total":3,"passed":2,"failed":1,"skipped":0}},{"name":"New Patient","pairs":[{"base":"Referal Generation and Regeneration","en":null,"es":{"name":"Referal Generation and Regeneration-Es","baseTestName":"Referal Generation and Regeneration","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":53849,"err":null,"isSpanish":true,"status":"passed"}},{"base":"Transcript Verification for the Second Conversation for the First Encounter","en":null,"es":{"name":"Transcript Verification for the Second Conversation for the First Encounter -Es","baseTestName":"Transcript Verification for the Second Conversation for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":42838,"err":null,"isSpanish":true,"status":"passed"}},{"base":"SOAP Note Generation for the First Encounter","en":{"name":"SOAP Note Generation for the First Encounter","baseTestName":"SOAP Note Generation for the First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":195910,"err":null,"isSpanish":false,"status":"passed"},"es":null},{"base":"Care plan Generation and Regeneration","en":null,"es":{"name":"Care plan Generation and Regeneration-Es","baseTestName":"Care plan Generation and Regeneration","suite":"New Patient","passed":false,"skipped":false,"failed":true,"dur":140244,"err":"element (\"~Descargar\") still not displayed after 10000ms","isSpanish":true,"status":"broken"}},{"base":"SoapNote Regeneration","en":null,"es":{"name":"SoapNote Regeneration-Es","baseTestName":"SoapNote Regeneration","suite":"New Patient","passed":false,"skipped":false,"failed":true,"dur":11798,"err":"element (\"~Regenerar nota SOAP\") still not displayed after 10000ms","isSpanish":true,"status":"broken"}},{"base":"Transcript verification for the Second Conversation in First Encounter","en":{"name":"Transcript verification for the Second Conversation in First Encounter","baseTestName":"Transcript verification for the Second Conversation in First Encounter","suite":"New Patient","passed":true,"skipped":false,"failed":false,"dur":11749,"err":null,"isSpanish":false,"status":"passed"},"es":null}],"stats":{"total":6,"passed":4,"failed":2,"skipped":0}},{"name":"Setting","pairs":[{"base":"Verify Setting's screen launguage and general settings","en":{"name":"Verify Setting's screen launguage and general settings","baseTestName":"Verify Setting's screen launguage and general settings","suite":"Setting","passed":true,"skipped":false,"failed":false,"dur":16783,"err":null,"isSpanish":false,"status":"passed"},"es":null}],"stats":{"total":1,"passed":1,"failed":0,"skipped":0}}],"stats":{"total":25,"passed":21,"failed":4,"skipped":0},"meta":{"platform":"Android","reportDate":"2/24/2026, 11:02:28 AM","reportTS":"2026-02-24T05:32:28.446Z"}};
 
 function sc(t){
   if(!t)return'';
