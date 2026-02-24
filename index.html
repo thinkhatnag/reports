@@ -1,719 +1,345 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobile Test Report - 2/16/2026, 7:23:14 AM</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-        }
-        .header h1 { margin-bottom: 10px; font-size: 28px; }
-        .header p { opacity: 0.9; font-size: 14px; }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            padding: 30px;
-            background: #f9fafb;
-        }
-        .stat-card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .stat-card.passed { border-left-color: #10b981; }
-        .stat-card.failed { border-left-color: #ef4444; }
-        .stat-card.skipped { border-left-color: #f59e0b; }
-        .stat-card h3 {
-            color: #6b7280;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-        .stat-card .value {
-            font-size: 32px;
-            font-weight: bold;
-            color: #1f2937;
-        }
-        .test-table-section { padding: 30px; }
-        .test-table-section h2 {
-            margin-bottom: 20px;
-            color: #1f2937;
-            font-size: 20px;
-        }
-        .save-indicator {
-            display: inline-block;
-            margin-left: 10px;
-            padding: 4px 12px;
-            background: #10b981;
-            color: white;
-            border-radius: 4px;
-            font-size: 12px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .save-indicator.show { opacity: 1; }
-        .legend {
-            margin-top: 20px;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f9fafb;
-            border-radius: 4px;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            border: 1px solid #e5e7eb;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-        .legend-item span { font-weight: 600; }
-        .legend-item.passed span { color: #10b981; }
-        .legend-item.failed span { color: #ef4444; }
-        .legend-item.skipped span { color: #f59e0b; }
-        .legend-item.not-run span { color: #9ca3af; }
-        .test-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .test-table thead { background: #f9fafb; }
-        .test-table th {
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            color: #374151;
-            border-bottom: 2px solid #e5e7eb;
-            font-size: 14px;
-            text-transform: uppercase;
-        }
-        .test-table td {
-            padding: 15px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .test-table tbody tr:hover { background: #f9fafb; }
-        .test-name {
-            font-weight: 500;
-            color: #1f2937;
-            max-width: 400px;
-        }
-        .status { font-weight: 600; font-size: 14px; }
-        .status.passed { color: #10b981; }
-        .status.failed { color: #ef4444; }
-        .status.skipped { color: #f59e0b; }
-        .status.not-run { color: #9ca3af; }
-        .comment-cell { min-width: 250px; }
-        .comment-input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .comment-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        .details {
-            padding: 30px;
-            border-top: 1px solid #e5e7eb;
-        }
-        .details h2 {
-            margin-bottom: 20px;
-            color: #1f2937;
-        }
-        .info-grid { display: grid; gap: 10px; }
-        .info-row {
-            display: grid;
-            grid-template-columns: 200px 1fr;
-            padding: 12px;
-            background: #f9fafb;
-            border-radius: 4px;
-        }
-        .info-label { font-weight: 600; color: #6b7280; }
-        .info-value { color: #1f2937; }
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #6b7280;
-            font-size: 14px;
-            border-top: 1px solid #e5e7eb;
-        }
-        .export-btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .export-btn:hover { background: #5568d3; }
-        .back-link {
-            display: inline-block;
-            margin-bottom: 15px;
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .back-link:hover { background: rgba(255,255,255,0.3); }
-    </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Noki — Test Reports</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0c10;
+  --sf:#111318;
+  --sf2:#181c24;
+  --sf3:#1e2330;
+  --bd:#252b38;
+  --bd2:#2e3748;
+  --tx:#e8ecf4;
+  --txm:#8892a4;
+  --txd:#3d4759;
+  --ios:#4f9eff;
+  --ios-dim:rgba(79,158,255,.12);
+  --ios-glow:rgba(79,158,255,.25);
+  --and:#34d17a;
+  --and-dim:rgba(52,209,122,.10);
+  --and-glow:rgba(52,209,122,.22);
+  --pass:#34d17a;
+  --fail:#f04f6e;
+  --skip:#f5c843;
+  --mono:'Space Mono',monospace;
+  --display:'Syne',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--mono);
+  background:var(--bg);
+  color:var(--tx);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(79,158,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(79,158,255,.03) 1px,transparent 1px);
+  background-size:48px 48px;
+  pointer-events:none;
+  z-index:0;
+}
+.page{
+  max-width:960px;
+  margin:0 auto;
+  padding:60px 24px 80px;
+  position:relative;
+  z-index:1;
+}
+
+/* HEADER */
+.hdr{margin-bottom:56px;position:relative}
+.hdr-eyebrow{
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--txm);margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.hdr-eyebrow::after{content:'';height:1px;width:60px;background:var(--bd2);display:inline-block}
+.hdr h1{
+  font-family:var(--display);
+  font-size:clamp(38px,6vw,66px);
+  font-weight:800;line-height:1.0;letter-spacing:-2px;
+  color:var(--tx);margin-bottom:14px;
+}
+.hdr h1 em{
+  font-style:normal;
+  background:linear-gradient(135deg,var(--ios) 0%,var(--and) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hdr-sub{font-size:11px;color:var(--txm);letter-spacing:.5px;line-height:1.8}
+.hdr-orb{
+  position:absolute;top:-30px;right:-40px;width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(79,158,255,.06) 0%,transparent 70%);
+  pointer-events:none;
+}
+
+/* LIVE BADGE */
+.live-badge{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--sf2);border:1px solid var(--bd);
+  padding:5px 14px;border-radius:100px;font-size:10px;
+  color:var(--txm);letter-spacing:1px;text-transform:uppercase;margin-bottom:36px;
+}
+.live-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--pass);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+/* SECTION LABEL */
+.section-label{
+  font-size:10px;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--txd);margin-bottom:16px;
+  display:flex;align-items:center;gap:12px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--bd)}
+
+/* PLATFORM SECTIONS */
+.platform{margin-bottom:44px}
+
+/* CARD */
+.card{
+  display:block;text-decoration:none;
+  background:var(--sf);border:1px solid var(--bd);border-radius:16px;
+  padding:28px 32px;position:relative;overflow:hidden;
+  transition:transform .25s cubic-bezier(.16,1,.3,1),border-color .25s,box-shadow .25s;
+}
+.card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s}
+.card.ios{border-left:3px solid var(--ios)}
+.card.ios::before{background:radial-gradient(ellipse at 8% 50%,var(--ios-dim) 0%,transparent 65%)}
+.card.ios:hover{border-color:var(--ios);box-shadow:0 0 0 1px var(--ios-glow),0 20px 60px rgba(0,0,0,.4);transform:translateY(-3px)}
+.card.ios:hover::before{opacity:1}
+.card.android{border-left:3px solid var(--and)}
+.card.android::before{background:radial-gradient(ellipse at 8% 50%,var(--and-dim) 0%,transparent 65%)}
+.card.android:hover{border-color:var(--and);box-shadow:0 0 0 1px var(--and-glow),0 20px 60px rgba(0,0,0,.4);transform:translateY(-3px)}
+.card.android:hover::before{opacity:1}
+.card-inner{position:relative;z-index:1}
+
+/* CARD TOP */
+.card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.card-platform{display:flex;align-items:center;gap:14px}
+.card-icon{font-size:30px;line-height:1}
+.card-title{font-family:var(--display);font-size:21px;font-weight:700;color:var(--tx);letter-spacing:-.5px}
+.card-subtitle{font-size:10px;color:var(--txm);letter-spacing:1px;margin-top:3px;text-transform:uppercase}
+.card-arrow{
+  width:36px;height:36px;border:1px solid var(--bd2);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--txm);font-size:16px;flex-shrink:0;
+  transition:all .2s;
+}
+.card:hover .card-arrow{background:var(--sf3);color:var(--tx);transform:rotate(45deg)}
+
+/* CARD META */
+.card-meta{font-size:10px;color:var(--txd);margin-bottom:20px;letter-spacing:.5px}
+.card-meta span{color:var(--txm)}
+
+/* STATS ROW */
+.stats-row{
+  display:flex;gap:0;
+  background:var(--sf2);border:1px solid var(--bd);border-radius:10px;overflow:hidden;
+}
+.stat-cell{flex:1;padding:14px 16px;border-right:1px solid var(--bd);position:relative}
+.stat-cell:last-child{border-right:none}
+.stat-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--txd);margin-bottom:6px}
+.stat-val{font-family:var(--display);font-size:28px;font-weight:700;line-height:1}
+.stat-cell.total .stat-val{color:var(--tx)}
+.stat-cell.pass  .stat-val{color:var(--pass)}
+.stat-cell.fail  .stat-val{color:var(--fail)}
+.stat-cell.skip  .stat-val{color:var(--skip)}
+.stat-cell.pass::after,.stat-cell.fail::after,.stat-cell.skip::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;opacity:.4;
+}
+.stat-cell.pass::after{background:var(--pass)}
+.stat-cell.fail::after{background:var(--fail)}
+.stat-cell.skip::after{background:var(--skip)}
+
+/* PROGRESS BAR */
+.progress-wrap{
+  margin-top:14px;height:4px;background:var(--sf2);border-radius:2px;overflow:hidden;display:flex;
+}
+.progress-pass{height:100%;background:var(--pass);transition:width .9s cubic-bezier(.16,1,.3,1)}
+.progress-fail{height:100%;background:var(--fail);transition:width .9s cubic-bezier(.16,1,.3,1)}
+.progress-skip{height:100%;background:var(--skip);transition:width .9s cubic-bezier(.16,1,.3,1)}
+
+/* NOT READY STATE */
+.not-ready{
+  background:var(--sf2);border:1px solid var(--bd);border-radius:10px;
+  padding:16px 18px;font-size:10px;color:var(--txm);
+  display:flex;align-items:center;gap:10px;letter-spacing:.3px;
+}
+.not-ready-dot{width:8px;height:8px;border-radius:50%;background:var(--bd2);flex-shrink:0}
+
+/* SKELETON */
+.skel{
+  background:linear-gradient(90deg,var(--sf2) 25%,var(--sf3) 50%,var(--sf2) 75%);
+  background-size:200% 100%;animation:shimmer 1.5s infinite;
+  border-radius:4px;height:1em;display:inline-block;
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* FOOTER */
+.footer{
+  margin-top:72px;padding-top:24px;border-top:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
+}
+.footer-left{font-size:10px;color:var(--txd);letter-spacing:.5px}
+.footer-stack{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--txd)}
+.fdot{width:4px;height:4px;border-radius:50%;background:var(--bd2)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.platform:nth-child(1) .card{animation:fadeUp .5s .1s cubic-bezier(.16,1,.3,1) both}
+.platform:nth-child(2) .card{animation:fadeUp .5s .2s cubic-bezier(.16,1,.3,1) both}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <a href="index.html" class="back-link">← Back to Dashboard</a>
-            <h1>🚀 Mobile Test Report</h1>
-            <p>Platform: <span id="platform"></span> | Generated: <span id="reportDate"></span></p>
-            <p style="margin-top: 5px; font-size: 12px;">Standalone Report - All Data Embedded</p>
+<div class="page">
+
+  <div class="hdr">
+    <div class="hdr-orb"></div>
+    <div class="hdr-eyebrow">Noki Mobile QA</div>
+    <h1>Test<br/><em>Reports</em></h1>
+    <p class="hdr-sub">WebdriverIO · Appium · Allure &mdash; iOS &amp; Android</p>
+  </div>
+
+  <div class="live-badge">
+    <span class="live-dot"></span>
+    Live report data
+  </div>
+
+  <!-- iOS -->
+  <section class="platform">
+    <div class="section-label">iOS Platform</div>
+    <a href="test-report.html" class="card ios">
+      <div class="card-inner">
+        <div class="card-top">
+          <div class="card-platform">
+            <div class="card-icon">🍎</div>
+            <div>
+              <div class="card-title">iOS Test Run</div>
+              <div class="card-subtitle">XCUITest · iPhone 16</div>
+            </div>
+          </div>
+          <div class="card-arrow">↗</div>
         </div>
-        <div class="stats">
-            <div class="stat-card">
-                <h3>Total Tests</h3>
-                <div class="value" id="statTotal">0</div>
-            </div>
-            <div class="stat-card passed">
-                <h3>✓ Passed</h3>
-                <div class="value" style="color: #10b981;" id="statPassed">0</div>
-            </div>
-            <div class="stat-card failed">
-                <h3>✗ Failed</h3>
-                <div class="value" style="color: #ef4444;" id="statFailed">0</div>
-            </div>
-            <div class="stat-card skipped">
-                <h3>⊗ Skipped</h3>
-                <div class="value" style="color: #f59e0b;" id="statSkipped">0</div>
-            </div>
+        <div class="card-meta" id="ios-meta"><span class="skel" style="width:220px">&nbsp;</span></div>
+        <div id="ios-body">
+          <div class="stats-row">
+            <div class="stat-cell total"><div class="stat-label">Total</div><div class="stat-val" id="ios-total">—</div></div>
+            <div class="stat-cell pass"> <div class="stat-label">Passed</div><div class="stat-val" id="ios-pass">—</div></div>
+            <div class="stat-cell fail"> <div class="stat-label">Failed</div><div class="stat-val" id="ios-fail">—</div></div>
+            <div class="stat-cell skip"> <div class="stat-label">Skipped</div><div class="stat-val" id="ios-skip">—</div></div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-pass" id="ios-bar-pass" style="width:0%"></div>
+            <div class="progress-fail" id="ios-bar-fail" style="width:0%"></div>
+            <div class="progress-skip" id="ios-bar-skip" style="width:0%"></div>
+          </div>
         </div>
-        <div class="test-table-section">
-            <h2>Test Cases Detail <span class="save-indicator" id="saveIndicator">✓ Saved</span></h2>
-            <div class="legend">
-                <div class="legend-item passed"><span>✓ PASS</span> - Test Passed</div>
-                <div class="legend-item failed"><span>✗ FAIL</span> - Test Failed</div>
-                <div class="legend-item skipped"><span>⊗ SKIPPED</span> - Test Skipped</div>
-                <div class="legend-item not-run"><span>- NOT RUN</span> - Test Not Executed</div>
+      </div>
+    </a>
+  </section>
+
+  <!-- Android -->
+  <section class="platform">
+    <div class="section-label">Android Platform</div>
+    <a href="android-test-report.html" class="card android">
+      <div class="card-inner">
+        <div class="card-top">
+          <div class="card-platform">
+            <div class="card-icon">🤖</div>
+            <div>
+              <div class="card-title">Android Test Run</div>
+              <div class="card-subtitle">UIAutomator2 · Physical Device</div>
             </div>
-            <table class="test-table">
-                <thead>
-                    <tr>
-                        <th>Test Case</th>
-                        <th>English</th>
-                        <th>Spanish</th>
-                        <th>Comments</th>
-                    </tr>
-                </thead>
-                <tbody id="testTableBody">
-                </tbody>
-            </table>
-            <button class="export-btn" onclick="exportToCSV()">📥 Export to CSV</button>
+          </div>
+          <div class="card-arrow">↗</div>
         </div>
-        <div class="details">
-            <h2>Test Execution Details</h2>
-            <div class="info-grid">
-                <div class="info-row">
-                    <div class="info-label">Platform:</div>
-                    <div class="info-value" id="detailPlatform"></div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Report Generated:</div>
-                    <div class="info-value" id="detailGenerated"></div>
-                </div>
-            </div>
+        <div class="card-meta" id="and-meta"><span class="skel" style="width:220px">&nbsp;</span></div>
+        <div id="and-body">
+          <div class="stats-row">
+            <div class="stat-cell total"><div class="stat-label">Total</div><div class="stat-val" id="and-total">—</div></div>
+            <div class="stat-cell pass"> <div class="stat-label">Passed</div><div class="stat-val" id="and-pass">—</div></div>
+            <div class="stat-cell fail"> <div class="stat-label">Failed</div><div class="stat-val" id="and-fail">—</div></div>
+            <div class="stat-cell skip"> <div class="stat-label">Skipped</div><div class="stat-val" id="and-skip">—</div></div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-pass" id="and-bar-pass" style="width:0%"></div>
+            <div class="progress-fail" id="and-bar-fail" style="width:0%"></div>
+            <div class="progress-skip" id="and-bar-skip" style="width:0%"></div>
+          </div>
         </div>
-        <div class="footer">
-            <p>Automated Mobile Testing Report - WebdriverIO + Appium + Allure</p>
-        </div>
+      </div>
+    </a>
+  </section>
+
+  <div class="footer">
+    <div class="footer-left">Noki Mobile QA · Automated Test Reports</div>
+    <div class="footer-stack">
+      WebdriverIO <div class="fdot"></div> Appium <div class="fdot"></div> Allure
     </div>
-    
-    <script>
-        // Embedded test data
-        const REPORT_DATA = {
-  "testCases": [
-    {
-      "name": "Login Error message verification: \"invalid Email\"",
-      "baseTestName": "Login Error message verification: \"invalid Email\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 8300,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error message verification: \"wrong password\"",
-      "baseTestName": "Login Error message verification: \"wrong password\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 15235,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error message verification: \"short Password\"",
-      "baseTestName": "Login Error message verification: \"short Password\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 15548,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error message verification: \"invalid Email\"",
-      "baseTestName": "Login Error message verification: \"invalid Email\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 8541,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login UI Verification",
-      "baseTestName": "Login UI Verification",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 5331,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error message verification: \"Password not Provided\"",
-      "baseTestName": "Login Error message verification: \"Password not Provided\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 13536,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error message verification: \"invalid Email\"",
-      "baseTestName": "Login Error message verification: \"invalid Email\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 8518,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error message verification: \"not registered Email\"",
-      "baseTestName": "Login Error message verification: \"not registered Email\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 8038,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login UI Verification",
-      "baseTestName": "Login UI Verification",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 5299,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error messge verification: \"Email is not provided\"",
-      "baseTestName": "Login Error messge verification: \"Email is not provided\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 8209,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error message verification: \"short Password\"",
-      "baseTestName": "Login Error message verification: \"short Password\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 14822,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error messge verification: \"Email is not provided\"",
-      "baseTestName": "Login Error messge verification: \"Email is not provided\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 8245,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error message verification: \"short Password\"",
-      "baseTestName": "Login Error message verification: \"short Password\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 14737,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error messge verification: \"Email is not provided\"",
-      "baseTestName": "Login Error messge verification: \"Email is not provided\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 8356,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error message verification: \"Password not Provided\"",
-      "baseTestName": "Login Error message verification: \"Password not Provided\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 12968,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error message verification: \"not registered Email\"",
-      "baseTestName": "Login Error message verification: \"not registered Email\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 7902,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error message verification: \"Password not Provided\"",
-      "baseTestName": "Login Error message verification: \"Password not Provided\"",
-      "passed": false,
-      "skipped": false,
-      "failed": true,
-      "duration": 21262,
-      "error": "Can't call click on element with selector \"~nagasurendra-badri-69g23\" because element wasn't found",
-      "isSpanish": false,
-      "status": "broken"
-    },
-    {
-      "name": "Login Error message verification: \"wrong password\"",
-      "baseTestName": "Login Error message verification: \"wrong password\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 15956,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error message verification: \"wrong password\"",
-      "baseTestName": "Login Error message verification: \"wrong password\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 14401,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login UI Verification",
-      "baseTestName": "Login UI Verification",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 5327,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
-    },
-    {
-      "name": "Login Error message verification: \"not registered Email\"",
-      "baseTestName": "Login Error message verification: \"not registered Email\"",
-      "passed": true,
-      "skipped": false,
-      "failed": false,
-      "duration": 7901,
-      "error": null,
-      "isSpanish": false,
-      "status": "passed"
+  </div>
+
+</div>
+<script>
+// Reads the embedded var D={...} from your generated test-report.html / android-test-report.html
+// These files already have D embedded — no server needed, pure static.
+async function loadStats(reportUrl, ids) {
+  try {
+    const res = await fetch(reportUrl, { cache: 'no-store' });
+    if (!res.ok) throw new Error('missing');
+    const text = await res.text();
+
+    // Match the embedded data block in your generated reports
+    const m = text.match(/var\s+D\s*=\s*(\{[\s\S]*?\});\s*\n/);
+    if (!m) throw new Error('no D block');
+    const d = JSON.parse(m[1]);
+    const { total, passed, failed, skipped } = d.stats;
+
+    document.getElementById(ids.meta).innerHTML =
+      'Generated: <span>' + d.meta.reportDate + '</span>' +
+      '&nbsp;·&nbsp;Platform: <span>' + d.meta.platform + '</span>';
+
+    document.getElementById(ids.total).textContent = total;
+    document.getElementById(ids.pass).textContent  = passed;
+    document.getElementById(ids.fail).textContent  = failed;
+    document.getElementById(ids.skip).textContent  = skipped;
+
+    if (total > 0) {
+      setTimeout(() => {
+        document.getElementById(ids.barPass).style.width = (passed / total * 100) + '%';
+        document.getElementById(ids.barFail).style.width = (failed / total * 100) + '%';
+        document.getElementById(ids.barSkip).style.width = (skipped / total * 100) + '%';
+      }, 400);
     }
-  ],
-  "groupedTests": [
-    {
-      "index": 0,
-      "baseTestName": "Login Error message verification: \"invalid Email\"",
-      "english": {
-        "name": "Login Error message verification: \"invalid Email\"",
-        "baseTestName": "Login Error message verification: \"invalid Email\"",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 8518,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 1,
-      "baseTestName": "Login Error message verification: \"wrong password\"",
-      "english": {
-        "name": "Login Error message verification: \"wrong password\"",
-        "baseTestName": "Login Error message verification: \"wrong password\"",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 14401,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 2,
-      "baseTestName": "Login Error message verification: \"short Password\"",
-      "english": {
-        "name": "Login Error message verification: \"short Password\"",
-        "baseTestName": "Login Error message verification: \"short Password\"",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 14737,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 3,
-      "baseTestName": "Login UI Verification",
-      "english": {
-        "name": "Login UI Verification",
-        "baseTestName": "Login UI Verification",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 5327,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 4,
-      "baseTestName": "Login Error message verification: \"Password not Provided\"",
-      "english": {
-        "name": "Login Error message verification: \"Password not Provided\"",
-        "baseTestName": "Login Error message verification: \"Password not Provided\"",
-        "passed": false,
-        "skipped": false,
-        "failed": true,
-        "duration": 21262,
-        "error": "Can't call click on element with selector \"~nagasurendra-badri-69g23\" because element wasn't found",
-        "isSpanish": false,
-        "status": "broken"
-      },
-      "spanish": null
-    },
-    {
-      "index": 5,
-      "baseTestName": "Login Error message verification: \"not registered Email\"",
-      "english": {
-        "name": "Login Error message verification: \"not registered Email\"",
-        "baseTestName": "Login Error message verification: \"not registered Email\"",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 7901,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    },
-    {
-      "index": 6,
-      "baseTestName": "Login Error messge verification: \"Email is not provided\"",
-      "english": {
-        "name": "Login Error messge verification: \"Email is not provided\"",
-        "baseTestName": "Login Error messge verification: \"Email is not provided\"",
-        "passed": true,
-        "skipped": false,
-        "failed": false,
-        "duration": 8356,
-        "error": null,
-        "isSpanish": false,
-        "status": "passed"
-      },
-      "spanish": null
-    }
-  ],
-  "stats": {
-    "total": 21,
-    "passed": 20,
-    "failed": 1,
-    "skipped": 0
-  },
-  "meta": {
-    "platform": "iOS",
-    "reportDate": "2/16/2026, 7:23:14 AM",
-    "reportTimestamp": "2026-02-16T01:53:14.737Z"
+  } catch(e) {
+    document.getElementById(ids.meta).innerHTML =
+      '<span style="color:var(--txd)">Not yet generated — run tests first</span>';
+    document.getElementById(ids.body).innerHTML =
+      '<div class="not-ready"><span class="not-ready-dot"></span>Report will appear here after first test run</div>';
   }
-};
-        
-        // Populate stats
-        document.getElementById('platform').textContent = REPORT_DATA.meta.platform.toUpperCase();
-        document.getElementById('reportDate').textContent = REPORT_DATA.meta.reportDate;
-        document.getElementById('statTotal').textContent = REPORT_DATA.stats.total;
-        document.getElementById('statPassed').textContent = REPORT_DATA.stats.passed;
-        document.getElementById('statFailed').textContent = REPORT_DATA.stats.failed;
-        document.getElementById('statSkipped').textContent = REPORT_DATA.stats.skipped;
-        document.getElementById('detailPlatform').textContent = REPORT_DATA.meta.platform.toUpperCase();
-        document.getElementById('detailGenerated').textContent = REPORT_DATA.meta.reportDate;
-        
-        // Generate table rows
-        const tbody = document.getElementById('testTableBody');
-        REPORT_DATA.groupedTests.forEach(group => {
-            const englishStatus = group.english
-                ? group.english.skipped ? "skipped" : group.english.passed ? "passed" : "failed"
-                : "not-run";
-            
-            const spanishStatus = group.spanish
-                ? group.spanish.skipped ? "skipped" : group.spanish.passed ? "passed" : "failed"
-                : "not-run";
-            
-            const englishText = group.english
-                ? group.english.skipped ? "⊗ SKIPPED" : group.english.passed ? "✓ PASS" : "✗ FAIL"
-                : "- NOT RUN";
-            
-            const spanishText = group.spanish
-                ? group.spanish.skipped ? "⊗ SKIPPED" : group.spanish.passed ? "✓ PASS" : "✗ FAIL"
-                : "- NOT RUN";
-            
-            const row = tbody.insertRow();
-            row.innerHTML = `
-                <td class="test-name">${group.baseTestName}</td>
-                <td class="status ${englishStatus}">${englishText}</td>
-                <td class="status ${spanishStatus}">${spanishText}</td>
-                <td class="comment-cell">
-                    <input type="text" 
-                           class="comment-input" 
-                           data-test-index="${group.index}"
-                           placeholder="Add comment..." 
-                           onchange="saveData()" />
-                </td>
-            `;
-        });
-        
-        // Load saved comments
-        function loadData() {
-            const inputs = document.querySelectorAll('.comment-input');
-            inputs.forEach((input) => {
-                const testIndex = input.getAttribute('data-test-index');
-                const saved = localStorage.getItem('test_comment_' + testIndex);
-                if (saved) { input.value = saved; }
-            });
-        }
-        
-        function saveData() {
-            const inputs = document.querySelectorAll('.comment-input');
-            inputs.forEach((input) => {
-                const testIndex = input.getAttribute('data-test-index');
-                localStorage.setItem('test_comment_' + testIndex, input.value);
-            });
-            const indicator = document.getElementById('saveIndicator');
-            indicator.classList.add('show');
-            setTimeout(() => { indicator.classList.remove('show'); }, 2000);
-        }
-        
-        function exportToCSV() {
-            let csv = 'Test Case,English,Spanish,Comments\n';
-            REPORT_DATA.groupedTests.forEach(group => {
-                const englishText = group.english
-                    ? group.english.skipped ? "SKIPPED" : group.english.passed ? "PASS" : "FAIL"
-                    : "NOT RUN";
-                
-                const spanishText = group.spanish
-                    ? group.spanish.skipped ? "SKIPPED" : group.spanish.passed ? "PASS" : "FAIL"
-                    : "NOT RUN";
-                
-                const input = document.querySelector(`input[data-test-index="${group.index}"]`);
-                const comment = input ? input.value.replace(/,/g, ';').replace(/"/g, '""') : '';
-                
-                csv += `"${group.baseTestName}","${englishText}","${spanishText}","${comment}"\n`;
-            });
-            
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'test-report-' + REPORT_DATA.meta.reportTimestamp.split('T')[0] + '.csv';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-        }
-        
-        window.addEventListener('load', loadData);
-    </script>
+}
+
+loadStats('test-report.html', {
+  meta:'ios-meta', body:'ios-body',
+  total:'ios-total', pass:'ios-pass', fail:'ios-fail', skip:'ios-skip',
+  barPass:'ios-bar-pass', barFail:'ios-bar-fail', barSkip:'ios-bar-skip'
+});
+loadStats('android-test-report.html', {
+  meta:'and-meta', body:'and-body',
+  total:'and-total', pass:'and-pass', fail:'and-fail', skip:'and-skip',
+  barPass:'and-bar-pass', barFail:'and-bar-fail', barSkip:'and-bar-skip'
+});
+</script>
 </body>
 </html>
